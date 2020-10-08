@@ -27,6 +27,7 @@ contract CentralizedOracle {
     address token;
     uint256 minDeposit;
     uint256 slashAmount;
+    uint256 challengerDeposit;
     address oracle;
     uint256 disputeDelay;
     uint256 oracleBalance;
@@ -36,6 +37,8 @@ contract CentralizedOracle {
       address challenger;
       uint256 requestId;
       uint256 timestamp;
+      uint256 bestTimestamp;
+      uint256 bestValue;
       uint8 state; // 0 - No Challenge; 1 -
       uint256 challengeTimestamp;
   }
@@ -52,6 +55,7 @@ contract CentralizedOracle {
       address _token,
       uint256 _minDeposit,
       uint256 _slashAmount,
+      uint256 _challengerDeposit,
       address _oracle,
       uint256 _disputeDelay)
       public {
@@ -63,6 +67,7 @@ contract CentralizedOracle {
           token: _token,
           minDeposit: _minDeposit,
           slashAmount: _slashAmount,
+          challengerDeposit: _challengerDeposit,
           oracle: _oracle,
           disputeDelay: _disputeDelay,
           oracleBalance: 0
@@ -88,11 +93,16 @@ contract CentralizedOracle {
           challenger: msg.sender,
           requestId: _requestId,
           timestamp: _timestamp,
+          bestTimestamp: _timestamp,
+          bestValue: values[_requestId][_timestamp],
           state: 1,
           challengeTimestamp: now
       });
       challenges.push(challenge);
       disputed[_requestId][_timestamp] = true;
+
+      IERC20 depositToken = IERC20(metadata[_requestId].token);
+      require(depositToken.transferFrom(msg.sender, address(this), metadata[_requestId].challengerDeposit));
   }
 
   function submitProof(uint256 _challengeId, uint256 _timestamp) public {
@@ -100,14 +110,40 @@ contract CentralizedOracle {
       Metadata storage metaTemp = metadata[challenge.requestId];
       require(msg.sender == challenge.challenger);
       require(challenge.state == 1);
-      require(now <= challenge.timestamp + metaTemp.disputeDelay);              // Fix with SafeMath
+      require(now <= challenge.challengeTimestamp + metaTemp.disputeDelay);     // Fix with SafeMath
       require(_timestamp - challenge.timestamp <= metaTemp.timestampWindow);    // Fix with SafeMath
 
       (bool retrieved, uint256 value) = receiverStorage.retrieveData(metaTemp.requestId, _timestamp);
       require(retrieved);
       require(value - values[challenge.requestId][challenge.timestamp] >= metaTemp.valueWindow);
 
+      challenge.bestValue = value;
+      challenge.bestTimestamp = _timestamp;
+      challenge.challengeTimestamp = now;
+      challenge.state = 2;
 
+      challenges[_challengeId] = challenge;
+  }
+
+  function oracleProof(uint256 _challengeId, uint256 _timestamp) public {
+      Challenge storage challenge = challenges[_challengeId];
+      Metadata storage metaTemp = metadata[challenge.requestId];
+
+      require(msg.sender == metaTemp.oracle);
+      require(challenge.state == 2);
+      require(now <= challenge.challengeTimestamp + metaTemp.disputeDelay); // Fix with SafeMath
+      require(_timestamp - challenge.timestamp <= challenge.bestTimestamp - challenge.timestamp); // Fix with SafeMath
+
+      (bool retrieved, uint256 value) = receiverStorage.retrieveData(metaTemp.requestId, _timestamp);
+      require(retrieved);
+      require(value - values[challenge.requestId][challenge.timestamp] <= metaTemp.valueWindow);
+
+      challenge.bestValue = value;
+      challenge.bestTimestamp = _timestamp;
+      challenge.challengeTimestamp = now;
+      challenge.state = 3;
+
+      challenges[_challengeId] = challenge;
   }
 
   function processChallenge(uint256 _challengeId) public {
