@@ -10,6 +10,7 @@ contract IERC20 {
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function allowance(address owner, address spender) external view returns (uint256);
     function approve(address spender, uint256 amount) external returns (bool);
+    function transfer(address recipient, uint256 amount) external returns (bool);
 }
 
 contract CentralizedOracle {
@@ -168,6 +169,7 @@ contract CentralizedOracle {
           depositToken.approve(challenge.challenger, allowance + metaTemp.slashAmount);
       } else {
           metaTemp.oracleBalance += metaTemp.challengerDeposit;
+          disputed[challenge.requestId][challenge.timestamp] = false;
       }
 
       challenge.state = 4;
@@ -180,5 +182,15 @@ contract CentralizedOracle {
       IERC20 depositToken = IERC20(metadata[_requestId].token);
       require(depositToken.transferFrom(msg.sender, address(this), _amount));
       metadata[_requestId].oracleBalance += _amount;
+  }
+
+  function oracleWithdraw(uint256 _requestId) public {
+      require(msg.sender == metadata[_requestId].oracle);
+      IERC20 depositToken = IERC20(metadata[_requestId].token);
+      require(now >= metadata[_requestId].latestTimestamp + metadata[_requestId].withdrawalDelay);
+      uint256 oracleBalance = metadata[_requestId].oracleBalance;
+      metadata[_requestId].oracleBalance = 0;
+
+      require(depositToken.transfer(msg.sender, oracleBalance));
   }
 }
