@@ -10,14 +10,16 @@ contract IStateSender {
 }
 
 contract Sender is UsingTellor {
-    address public stateSenderContract; // Hardcoded
+    IStateSender public stateSender; // Hardcoded
     address public receiver; // Hardcoded
 
-    constructor(address payable _tellorAddress) UsingTellor(_tellorAddress) public {}
+    constructor(address payable _tellorAddress, address _stateSender) UsingTellor(_tellorAddress) public {
+      stateSender = IStateSender(_stateSender);
+    }
 
     function retrieveDataAndSend(uint256 _requestId, uint256 _timestamp) public {
         uint256 value = retrieveData(_requestId, _timestamp);
         // Check that valid value exists?
-        syncState(receiver, abi.encodePacked(_requestId, _timestamp, value));
+        stateSender.syncState(receiver, abi.encode(_requestId, _timestamp, value));
     }
 }
