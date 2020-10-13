@@ -23,7 +23,6 @@ contract CentralizedOracle {
     uint256 valueWindow;            // Min distance from which a decentralized value knocks out a centralized value
   }
 
-
   constructor(address _receiverStorage, address _owner, address _oracle) public {
       receiverStorage = IReceiverStorage(_receiverStorage);
       owner = _owner;
@@ -57,10 +56,13 @@ contract CentralizedOracle {
 
   function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
       require(set[_requestId][_timestamp]);
-      require(_challengeTimestamp - _timestamp <= metadata[_requestId].timestampWindow);
+      require(_challengeTimestamp - _timestamp <= metadata[_requestId].timestampWindow);            // SafeMath
 
       (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _challengeTimestamp);
+      require(retrieved);
+      require(retrievedValue - values[_requestId][_timestamp] > metadata[_requestId].valueWindow);  // SafeMath
 
+      locked[_requestId][_timestamp] = true;
+      values[_requestId][_timestamp] = retrievedValue;
   }
-
 }
