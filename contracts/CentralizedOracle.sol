@@ -19,6 +19,7 @@ contract CentralizedOracle {
   mapping (uint256 => mapping(uint256 => uint256)) public values;
   mapping (uint256 => mapping(uint256 => bool)) public set;
   mapping (uint256 => mapping(uint256 => bool)) public disputed;
+  mapping (uint256 => mapping(uint256 => bool)) public locked;
   mapping (uint256 => Metadata) public metadata;
   Challenge[] public challenges;
   uint256 datasetCount;
@@ -28,14 +29,10 @@ contract CentralizedOracle {
     uint256 timestampWindow;        // Max distance from which a challenge datapoint applies to a centralized datapoint
     uint256 valueWindow;            // Min distance from which a decentralized value knocks out a centralized value
     address token;                  // Token used for deposits
-    uint256 minDeposit;             // Minimum balance oracle must have to submit new data
-    uint256 slashAmount;            // How much of deposit lost for inadequate data
     uint256 challengerDeposit;      // Deposit required to challenge data
     address oracle;                 // Centralized oracle's address
     uint256 disputeDelay;           // Delay window for submitting dispute proof
-    uint256 oracleBalance;          // Oracle's token balance
     uint256 latestTimestamp;        // Last time data was submitted
-    uint256 withdrawalDelay;        // Time delay for withdrawing oracle deposit
   }
 
   struct Challenge {
@@ -58,12 +55,9 @@ contract CentralizedOracle {
       uint256 _timestampWindow,
       uint256 _valueWindow,
       address _token,
-      uint256 _minDeposit,
-      uint256 _slashAmount,
       uint256 _challengerDeposit,
       address _oracle,
-      uint256 _disputeDelay,
-      uint256 _withdrawalDelay)
+      uint256 _disputeDelay)
       public {
 
       metadata[datasetCount] = Metadata({
@@ -71,14 +65,10 @@ contract CentralizedOracle {
           timestampWindow: _timestampWindow,
           valueWindow: _valueWindow,
           token: _token,
-          minDeposit: _minDeposit,
-          slashAmount: _slashAmount,
           challengerDeposit: _challengerDeposit,
           oracle: _oracle,
           disputeDelay: _disputeDelay,
-          oracleBalance: 0,
-          latestTimestamp: 0,
-          withdrawalDelay: _withdrawalDelay
+          latestTimestamp: 0
       });
 
       datasetCount++;
@@ -87,7 +77,6 @@ contract CentralizedOracle {
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
       Metadata memory metaTemp = metadata[_requestId];
       require(msg.sender == metaTemp.oracle);
-      require(metaTemp.oracleBalance >= metaTemp.minDeposit);
 
       values[_requestId][_timestamp] = _value;
       set[_requestId][_timestamp] = true;
@@ -142,12 +131,8 @@ contract CentralizedOracle {
       require(challenge.state != 4);
 
       if (challenge.state == 2) {
-          metaTemp.oracleBalance -= metaTemp.slashAmount;     // Fix with SafeMath
-          uint256 allowance = depositToken.allowance(address(this), challenge.challenger);
-          depositToken.approve(challenge.challenger, 0);
-          depositToken.approve(challenge.challenger, allowance + metaTemp.slashAmount);
+
       } else {
-          metaTemp.oracleBalance += metaTemp.challengerDeposit;
           disputed[challenge.requestId][challenge.timestamp] = false;
       }
 
