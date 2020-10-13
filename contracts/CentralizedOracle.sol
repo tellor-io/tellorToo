@@ -85,7 +85,7 @@ contract CentralizedOracle {
   }
 
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
-      Metadata storage metaTemp = metadata[_requestId];
+      Metadata memory metaTemp = metadata[_requestId];
       require(msg.sender == metaTemp.oracle);
       require(metaTemp.oracleBalance >= metaTemp.minDeposit);
 
@@ -115,8 +115,8 @@ contract CentralizedOracle {
   }
 
   function submitProof(uint256 _challengeId, uint256 _timestamp) public {
-      Challenge storage challenge = challenges[_challengeId];
-      Metadata storage metaTemp = metadata[challenge.requestId];
+      Challenge memory challenge = challenges[_challengeId];
+      Metadata memory metaTemp = metadata[challenge.requestId];
       require(msg.sender == challenge.challenger);
       require(challenge.state == 1);
       require(now <= challenge.challengeTimestamp + metaTemp.disputeDelay);     // Fix with SafeMath
@@ -134,30 +134,9 @@ contract CentralizedOracle {
       challenges[_challengeId] = challenge;
   }
 
-  function oracleProof(uint256 _challengeId, uint256 _timestamp) public {
-      Challenge storage challenge = challenges[_challengeId];
-      Metadata storage metaTemp = metadata[challenge.requestId];
-
-      require(msg.sender == metaTemp.oracle);
-      require(challenge.state == 2);
-      require(now <= challenge.challengeTimestamp + metaTemp.disputeDelay); // Fix with SafeMath
-      require(_timestamp - challenge.timestamp <= challenge.bestTimestamp - challenge.timestamp); // Fix with SafeMath
-
-      (bool retrieved, uint256 value) = receiverStorage.retrieveData(metaTemp.requestId, _timestamp);
-      require(retrieved);
-      require(value - values[challenge.requestId][challenge.timestamp] <= metaTemp.valueWindow);
-
-      challenge.bestValue = value;
-      challenge.bestTimestamp = _timestamp;
-      challenge.challengeTimestamp = now;
-      challenge.state = 3;
-
-      challenges[_challengeId] = challenge;
-  }
-
   function processChallenge(uint256 _challengeId) public {
-      Challenge storage challenge = challenges[_challengeId];
-      Metadata storage metaTemp = metadata[challenge.requestId];
+      Challenge memory challenge = challenges[_challengeId];
+      Metadata memory metaTemp = metadata[challenge.requestId];
       IERC20 depositToken = IERC20(metaTemp.token);
       require(now >= challenge.challengeTimestamp + metaTemp.disputeDelay);
       require(challenge.state != 4);
@@ -176,21 +155,5 @@ contract CentralizedOracle {
 
       challenges[_challengeId] = challenge;
       metadata[challenge.requestId] = metaTemp;
-  }
-
-  function oracleDeposit(uint256 _requestId, uint256 _amount) public {
-      IERC20 depositToken = IERC20(metadata[_requestId].token);
-      require(depositToken.transferFrom(msg.sender, address(this), _amount));
-      metadata[_requestId].oracleBalance += _amount;
-  }
-
-  function oracleWithdraw(uint256 _requestId) public {
-      require(msg.sender == metadata[_requestId].oracle);
-      IERC20 depositToken = IERC20(metadata[_requestId].token);
-      require(now >= metadata[_requestId].latestTimestamp + metadata[_requestId].withdrawalDelay);
-      uint256 oracleBalance = metadata[_requestId].oracleBalance;
-      metadata[_requestId].oracleBalance = 0;
-
-      require(depositToken.transfer(msg.sender, oracleBalance));
   }
 }
