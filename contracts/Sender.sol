@@ -19,7 +19,7 @@ contract Sender is UsingTellor {
 
     function retrieveDataAndSend(uint256 _requestId, uint256 _timestamp) public {
         uint256 value = retrieveData(_requestId, _timestamp);
-        // Check that valid value exists?
+        require(value > 0);
         stateSender.syncState(receiver, abi.encode(_requestId, _timestamp, value));
     }
 

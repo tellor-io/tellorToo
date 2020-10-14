@@ -55,7 +55,6 @@ contract CentralizedOracle {
   struct Metadata {
     uint256 referenceRequestId;     // ID of corresponding mainnet data
     uint256 timestampWindow;        // Max distance from which a challenge datapoint applies to a centralized datapoint
-    uint256 valueWindow;            // Min distance from which a decentralized value knocks out a centralized value
   }
 
   constructor(address _receiverStorage, address _owner, address _oracle) public {
@@ -92,13 +91,10 @@ contract CentralizedOracle {
 
   function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
       require(set[_requestId][_timestamp]);
-    //   require(_challengeTimestamp - _timestamp <= metadata[_requestId].timestampWindow);            // SafeMath
       require(_challengeTimestamp.max(_timestamp).sub(_challengeTimestamp.min(_timestamp)) <= metadata[_requestId].timestampWindow);
 
       (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _challengeTimestamp);
       require(retrieved);
-      require(retrievedValue - values[_requestId][_timestamp] > metadata[_requestId].valueWindow);  // SafeMath
-      require(retrievedValue.max(values[_requestId][_timestamp]).sub(retrievedValue.min(values[_requestId][_timestamp])) > metadata[_requestId].valueWindow);
       locked[_requestId][_timestamp] = true;
       values[_requestId][_timestamp] = retrievedValue;
   }

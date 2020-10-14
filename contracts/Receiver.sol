@@ -10,13 +10,17 @@ interface IStateReceiver {
 contract ReceiverStorage {
   mapping(uint256 => mapping(uint256 => uint256)) public values;
   mapping(uint256 => mapping(uint256 => bool)) public set;
+  mapping(uint256 => uint256[]) public timestamps;
+
+  address constant STATE_SYNCER_ROLE = 0x0000000000000000000000000000000000001001;
 
   function onStateReceive(uint256 stateId, bytes calldata data) external {
     // Check for valid caller
-    // Decode bytes data
+    require(msg.sender == STATE_SYNCER_ROLE);
     (uint256 requestId, uint256 timestamp, uint256 value) = parse96BytesToThreeUint256(data);
 
     values[requestId][timestamp] = value;   // Save to values datastore
+    timestamps[requestId].push(timestamp);
     set[requestId][timestamp] = true;
   }
 
