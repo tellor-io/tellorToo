@@ -96,4 +96,23 @@ contract CentralizedOracle {
       locked[_requestId][_timestamp] = true;
       values[_requestId][_timestamp] = retrievedValue;
   }
+
+  // Functions that allow for the use of UsingTellor
+  function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(uint256){
+      return values[_requestId][_timestamp];
+  }
+
+  function isInDispute(uint256 _requestId, uint256 _timestamp) public view returns(bool){
+      return isDisputed[_requestId][_timestamp];
+  }
+
+  function getNewValueCountbyRequestId(uint256 _requestId) public view returns(uint) {
+      return timestamps[_requestId].length;
+  }
+
+  function getTimestampbyRequestIDandIndex(uint256 _requestId, uint256 index) public view returns(uint256) {
+      uint len = timestamps[_requestId].length;
+      if(len == 0 || len <= index) return 0;
+      return timestamps[_requestId][index];
+  }
 }
