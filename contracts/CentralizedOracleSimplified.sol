@@ -66,15 +66,13 @@ contract CentralizedOracle {
 
   function newDataset(
       uint256 _referenceRequestId,
-      uint256 _timestampWindow,
-      uint256 _valueWindow)
+      uint256 _timestampWindow)
       public {
       require(msg.sender == owner);
 
       metadata[datasetCount] = Metadata({
           referenceRequestId: _referenceRequestId,
-          timestampWindow: _timestampWindow,
-          valueWindow: _valueWindow
+          timestampWindow: _timestampWindow
       });
 
       datasetCount++;
