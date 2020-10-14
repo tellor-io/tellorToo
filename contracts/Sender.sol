@@ -22,4 +22,10 @@ contract Sender is UsingTellor {
         // Check that valid value exists?
         stateSender.syncState(receiver, abi.encode(_requestId, _timestamp, value));
     }
+
+    function getCurrentValueAndSend(uint256 _requestId) public {
+      (uint256 ifRetrieve, uint256 value, uint256 timestamp) = getCurrentValue(_requestId);
+      require(ifRetrieve);
+      stateSender.syncState(receiver, abi.encode(_requestId, timestamp, value));
+    }
 }
