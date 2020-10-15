@@ -43,7 +43,6 @@ contract CentralizedOracle {
   IReceiverStorage public receiverStorage;
 
   mapping (uint256 => mapping(uint256 => uint256)) public values;
-  mapping (uint256 => mapping(uint256 => bool)) public set;
   mapping (uint256 => mapping(uint256 => bool)) public locked;
   mapping (uint256 => mapping(uint256 => bool)) public isDisputed;
   mapping(uint256 => uint256[]) public timestamps;
@@ -84,11 +83,10 @@ contract CentralizedOracle {
 
       values[_requestId][_timestamp] = _value;
       timestamps[_requestId].push(_timestamp);
-      set[_requestId][_timestamp] = true;
   }
 
   function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
-      require(set[_requestId][_timestamp]);
+      require(values[_requestId][_timestamp] > 0);
       require(_challengeTimestamp.max(_timestamp).sub(_challengeTimestamp.min(_timestamp)) <= metadata[_requestId].timestampWindow);
 
       (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _challengeTimestamp);
