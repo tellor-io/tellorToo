@@ -17,7 +17,6 @@ contract ReceiverStorage {
   constructor() public {}
 
   function onStateReceive(uint256 stateId, bytes calldata data) external {
-    // Check for valid caller
     require(msg.sender == STATE_SYNCER_ROLE);
     (uint256 requestId, uint256 timestamp, uint256 value) = parse96BytesToThreeUint256(data);
 
