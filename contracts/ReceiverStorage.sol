@@ -1,4 +1,4 @@
-// Receiver.sol
+// ReceiverStorage.sol
 
 pragma solidity 0.5.16;
 
@@ -14,6 +14,8 @@ contract ReceiverStorage {
 
   address constant STATE_SYNCER_ROLE = 0x0000000000000000000000000000000000001001;
 
+  constructor() public {}
+
   function onStateReceive(uint256 stateId, bytes calldata data) external {
     // Check for valid caller
     require(msg.sender == STATE_SYNCER_ROLE);
@@ -28,7 +30,7 @@ contract ReceiverStorage {
     return(set[_requestId][_timestamp], values[_requestId][_timestamp]);
   }
 
-  function parse96BytesToThreeUint256(bytes memory data) public returns(uint256, uint256, uint256) {
+  function parse96BytesToThreeUint256(bytes memory data) public pure returns(uint256, uint256, uint256) {
     uint256 parsed1;
     uint256 parsed2;
     uint256 parsed3;
