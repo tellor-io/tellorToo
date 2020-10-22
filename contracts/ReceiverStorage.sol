@@ -16,6 +16,11 @@ contract ReceiverStorage {
 
   constructor() public {}
 
+//Receives the state from Matic 
+  /**
+  automatic checkpoints occur every 10 mins by Matic validators?
+  data--
+  */
   function onStateReceive(uint256 stateId, bytes calldata data) external {
     require(msg.sender == STATE_SYNCER_ROLE);
     (uint256 requestId, uint256 timestamp, uint256 value) = parse96BytesToThreeUint256(data);
@@ -24,7 +29,10 @@ contract ReceiverStorage {
     timestamps[requestId].push(timestamp);
     set[requestId][timestamp] = true;
   }
-
+  
+  /**
+  Returns data saved on this contract that is received through onStateReceive to be read by centralized contract on Matic
+  */
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256) {
     return(set[_requestId][_timestamp], values[_requestId][_timestamp]);
   }

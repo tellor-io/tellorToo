@@ -32,10 +32,16 @@ library SafeMath {
         }
     }
 }
-contract IReceiverStorage {
+
+//Inerface right???
+interface IReceiverStorage {
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256);
 }
 
+
+/**
+Ensure the request Id exists in Tellor before using it as a dispute mechanism
+*/
 contract CentralizedOracle {
   using SafeMath for uint256;
 
@@ -44,7 +50,7 @@ contract CentralizedOracle {
   mapping (uint256 => mapping(uint256 => uint256)) public values;
   mapping (uint256 => mapping(uint256 => bool)) public locked;
   mapping (uint256 => mapping(uint256 => bool)) public isDisputed;
-  mapping(uint256 => uint256[]) public timestamps;
+  mapping (uint256 => uint256[]) public timestamps;
   mapping (uint256 => Metadata) public metadata;
   uint256 datasetCount;
   address owner;
@@ -55,6 +61,12 @@ contract CentralizedOracle {
     uint256 timestampWindow;        // Max distance from which a challenge datapoint applies to a centralized datapoint
   }
 
+  /**
+  Sets the receiverStorage to save data from, owner and oracle
+  @param _receiverStorage is the receiver address from Matic
+  @param _owner is the centralized oracle owner
+  @param _oracle is Tellor's address??? or the central oracle address???
+  */
   constructor(address _receiverStorage, address _owner, address _oracle) public {
       receiverStorage = IReceiverStorage(_receiverStorage);
       owner = _owner;
@@ -62,6 +74,9 @@ contract CentralizedOracle {
       datasetCount=0;
   }
 
+  /**
+  Saves data
+  */
   function newDataset(
       uint256 _referenceRequestId,
       uint256 _timestampWindow)
@@ -76,6 +91,10 @@ contract CentralizedOracle {
       datasetCount++;
   }
 
+  /**
+  @dev Allows centralized oracle to submit data
+  @param _requestId is tellors requestId
+  */
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
       require(msg.sender == oracle);
       require(!locked[_requestId][_timestamp]);
@@ -84,17 +103,30 @@ contract CentralizedOracle {
       timestamps[_requestId].push(_timestamp);
   }
 
+  /**
+  Allows parties to challenge centralize oracle's data and replace with Tellor Data...
+  could this be exploited, can anyone run this and replace with a Tellor value? 
+  Cost to challenge/cost to lying  ---centralized oracle staked?
+  should everyone be allowed to dispute/challenge
+  waiting period before data is updated???
+  should the challenge and settlement be done in two functions ???
+  play challenge by delaying data on ethereum tellor---
+
+
+  */
   function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
       require(values[_requestId][_timestamp] > 0);
       require(_challengeTimestamp.max(_timestamp).sub(_challengeTimestamp.min(_timestamp)) <= metadata[_requestId].timestampWindow);
 
       (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _challengeTimestamp);
-      require(retrieved);
+      require(retrieved, "Data cannot be challenged because it has not been retreived");
       locked[_requestId][_timestamp] = true;
       values[_requestId][_timestamp] = retrievedValue;
   }
 
-  // Functions that allow for the use of UsingTellor
+
+  //How is the dispute settled??? is it settled in challengeData??? How are the functions below being used???
+  // Functions that allow 
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(uint256){
       return values[_requestId][_timestamp];
   }
