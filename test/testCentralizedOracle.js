@@ -19,7 +19,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
     	console.log('mockTellor', mockTellor.address)
     usingTellor = await UsingTellor.new(mockTellor.address)
 
-    //mine a value
+    //add a value
     await mockTellor.submitValue(1, 1000)
     value = await usingTellor.getCurrentValue(1) 
     console.log("value", value[1]*1, value[2]*1)
@@ -37,7 +37,9 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
    
   });
 
-
+  it("Add new dataset to centralizedOracle ", async function() {
+    await centralizedOracle.newDataset(    uint256 _referenceRequestId,      uint256 _timestampWindow)
+  });
  //centralizedOracle.newDataset(    uint256 _referenceRequestId,      uint256 _timestampWindow)
  //centralizedOracle.submitData(uint256 _requestId, uint256 _timestamp, uint256 _value)
  //centralizedOracle.challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp)
