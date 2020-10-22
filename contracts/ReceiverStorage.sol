@@ -14,7 +14,6 @@ contract ReceiverStorage {
 
   address constant STATE_SYNCER_ROLE = 0x0000000000000000000000000000000000001001;
 
-  constructor() public {}
 
 //Receives the state from Matic 
   /**

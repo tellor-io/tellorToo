@@ -18,6 +18,17 @@
  *
  */
 
+ require("dotenv").config();
+const HDWalletProvider = require("@truffle/hdwallet-provider");
+
+//const mnemonic = process.env.ETH_MNEMONIC;
+const accessToken = process.env.WEB3_INFURA_PROJECT_ID;
+const mnemonic =
+  "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish";
+
+// ganache-cli -m "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish" -l 10000000 --allowUnlimitedContractSize
+
+
 // const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
@@ -72,11 +83,44 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+    development: {
+      host: "localhost",
+      port: 8545,
+      network_id: "*",
+      gas: 10000000, // default ganache-cli value
+    },
+    rinkeby: {
+      provider: () =>
+        new HDWalletProvider(
+          "3a10b4bc1258e8bfefb95b498fb8c0f0cd6964a811eabca87df5630bcacd7216",
+          `https://rinkeby.infura.io/v3/${accessToken}`
+        ),
+      network_id: 4,
+      gas: 10000000,
+      gasPrice: 80000000000,
+    },
+    mainnet: {
+      provider: () =>
+        new HDWalletProvider(
+          "",
+          `https://mainnet.infura.io/v3/${accessToken}`
+        ),
+      network_id: 1,
+      gas: 10000000,
+      gasPrice: 85000000000,
+    },
   },
+
+
 
   // Set default mocha options here, use special reporters etc.
   mocha: {
-    // timeout: 100000
+    enableTimeouts: false,
+    before_timeout: 210000, // Here is 2min but can be whatever timeout is suitable for you.
+    //reporter: "eth-gas-reporter",
+    reporterOptions: {
+      currency: "USD",
+    },
   },
 
   // Configure your compilers

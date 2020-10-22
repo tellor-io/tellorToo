@@ -7,7 +7,7 @@ import "./UsingTellor.sol";
 /** IS this a contract or an interface???
 Does the StateSender address for Sender come from deploying this????
 */
-interface IStateSender {
+contract IStateSender {
   function syncState(address receiver, bytes calldata data) external;
   function register(address sender, address receiver) public;
 }
