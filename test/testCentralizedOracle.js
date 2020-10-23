@@ -84,32 +84,34 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
     assert(timestamp2==_now, "the timesamtp should be _now")
    });
 
-  // it(" Test challengeData and isIndDispute", async function() {
-  // 	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
-  //   let _now1 = _now - 84000;
-  //   await centralizedOracle.newDataset( 1,  3600) 
-  //   await centralizedOracle.submitData(1, _now1, 1000)
-  //   await centralizedOracle.retrieveData(1, _now1)
-  //   await centralizedOracle.submitData(1, _now, 2000) 
-  //   let val2 = await centralizedOracle.retrieveData(1, _now1)
-  //   console.log('value before challenge', val2*1)
+  it(" Test challengeData and isUnderChallenge", async function() {
+  	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
+    let _now1 = _now - 1800;
+    console.log('now, now1', _now, _now1)
+    await centralizedOracle.newDataset( 1,  3600) 
+    await centralizedOracle.submitData(1, _now1, 1000)
+    await centralizedOracle.retrieveData(1, _now1)
+    await centralizedOracle.submitData(1, _now, 2000) 
+    let val2 = await centralizedOracle.retrieveData(1, _now1)
+    console.log('value before challenge', val2*1)
 
-  //   //fast forward time
-  //   await centralizedOracle.challengeData(1, _now, _now1) //uint256 _timestamp, uint256 _challengeTimestamp
-  //   let dispute = await centralizedOracle.isInDispute(1, _now)
-  //   assert(dispute == true, "Value is not under dispute")
-  //   let val1 = await centralizedOracle.retrieveData(1, _now)
-  //   assert(val1 == 6000, "value replaced with MockTellor's value")
-  //  });
+    await receiverStorage.testProvideData(1, _now, 8000)
+
+    await centralizedOracle.challengeData(1, _now) //uint256 _timestamp, uint256 _challengeTimestamp
+    let dispute = await centralizedOracle.isUnderChallenge(1, _now)
+    assert(dispute == true, "Value is not under dispute")
+    let val1 = await centralizedOracle.retrieveData(1, _now)
+    assert(val1 == 8000, "value replaced with MockTellor's value")
+   });
 
   // *********************Receiver******************************************/
-  it("Test onStateReceive", async function() {
+  // it("Test onStateReceive", async function() {
 
-  });
+  // });
 
-    it("Test retrieveData", async function() {
+  //   it("Test retrieveData", async function() {
 
-  });
+  // });
 
 //onStateReceive(uint256 stateId, bytes calldata data)//how do i create a mock validator....???
 
@@ -119,13 +121,13 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
 //sender.retrieveDataAndSend(uint256 _requestId, uint256 _timestamp)
 //sender.getCurrentValueAndSend(uint256 _requestId)
 
-  it("Test ", async function() {
+  // it("Test retrieveDataAndSend", async function() {
 
-  });
+  // });
 
-  it("Test ", async function() {
+  // it("Test getCurrentValueAndSend", async function() {
 
-  });
+  // });
 
 
 });

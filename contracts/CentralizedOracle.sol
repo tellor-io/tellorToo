@@ -50,7 +50,7 @@ contract CentralizedOracle  {
 
   mapping (uint256 => mapping(uint256 => uint256)) public values;
   mapping (uint256 => mapping(uint256 => bool)) public locked;
-  mapping (uint256 => mapping(uint256 => bool)) public isDisputed;
+  mapping (uint256 => mapping(uint256 => bool)) public isChallenged;
   mapping (uint256 => uint256[]) public timestamps;
   mapping (uint256 => Metadata) public metadata;
   uint256 datasetCount;
@@ -105,16 +105,6 @@ contract CentralizedOracle  {
       timestamps[_requestId].push(_timestamp);
   }
 
- 
-  // function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
-  //     require(values[_requestId][_timestamp] > 0);
-  //     require(_challengeTimestamp.max(_timestamp).sub(_challengeTimestamp.min(_timestamp)) <= metadata[_requestId].timestampWindow);
-
-  //     (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _challengeTimestamp);
-  //     require(retrieved, "Data cannot be challenged because it has not been retreived");
-  //     locked[_requestId][_timestamp] = true;
-  //     values[_requestId][_timestamp] = retrievedValue;
-  // }
 
   /**
   @dev Allows any party to challenged data provided by the centralized oracle
@@ -123,11 +113,9 @@ contract CentralizedOracle  {
   */
   function challengeData(uint256 _requestId, uint256 _timestamp) public {
       require(values[_requestId][_timestamp] > 0, 'The timestamp to be disputed does not exist');
-      uint now = (now - (now % 1 hours);
-      uint len = timestamps[_requestId].length;
-      uint lastTimestamp = timestamps[_requestId][len-1];
+      uint now1 = now - (now % 1 hours);
 
-      require(now.sub(_timestamp) <= metadata[_requestId].timestampWindow,
+      require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,
         'The window to dispute has ended');
 
       (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _timestamp);
@@ -143,10 +131,14 @@ contract CentralizedOracle  {
   */
   function settleChallenge(uint256 _requestId, uint256 _timestamp) public {
     require(locked[_requestId][_timestamp]);
-    uint now = (now - (now % 1 hours);
-    require(now - _timestamp > 2 hours, '1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed');
+    uint now1 = now - (now % 1 hours);
+    require(now1 - _timestamp > 2 hours, '1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed');
+
+    //Maybe loop through available timestamp values starting with _timestamp until one is found??? what are the odds that these will be the same?
     (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _timestamp);
+    
     require(retrieved, "Challenge cannot be settled because data has not been received from Tellor's mainnet Ethereum");
+    //require(_timestamp - tellorTimestamp < 3 hours, 'The available Tellor data is older than three hours from disputed timestamp');
     locked[_requestId][_timestamp] = false;
     values[_requestId][_timestamp] = retrievedValue;
   }
@@ -167,8 +159,8 @@ contract CentralizedOracle  {
   @param _timestamp is the timestamp to look up
   @return true if it is being challenged 
   */
-  function isInDispute(uint256 _requestId, uint256 _timestamp) public view returns(bool){
-      return isDisputed[_requestId][_timestamp];
+  function isUnderChallenge(uint256 _requestId, uint256 _timestamp) public view returns(bool){
+      return isChallenged[_requestId][_timestamp];
   }
 
   /**

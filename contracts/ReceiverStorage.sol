@@ -57,4 +57,16 @@ contract ReceiverStorage {
     }
     return(parsed1, parsed2, parsed3);
   }
+
+  /**
+  @dev This is a test function and will be commented out for production
+  */
+  function testProvideData(uint256 _requestId, uint256 _timestamp, uint256 _value) public  {
+    values[_requestId][_timestamp] = _value;   // Save to values datastore
+    timestamps[_requestId].push(_timestamp);
+    set[_requestId][_timestamp] = true;
+  }
+
+
+
 }
