@@ -3,9 +3,10 @@ pragma solidity 0.5.16;
 import "./MockTellor.sol";
 
 /**
-* @title UserContract
-* This contracts creates for easy integration to the Tellor System
+* @title UserContract 
+* This is a TEST contract. It creates for easy integration to the Tellor System
 * by allowing smart contracts to read data off Tellor
+* **************only for testing**************
 */
 contract UsingTellor{
     MockTellor tellor;

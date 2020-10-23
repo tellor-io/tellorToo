@@ -7,6 +7,10 @@ interface IStateReceiver {
   function onStateReceive(uint256 stateId, bytes calldata data) external;
 }
 
+/**
+@title ReceiverStorage
+This contract helps receive and decode Tellor's data from Ethereum on Matic's Network
+*/
 contract ReceiverStorage {
   mapping(uint256 => mapping(uint256 => uint256)) public values;
   mapping(uint256 => mapping(uint256 => bool)) public set;
@@ -14,11 +18,10 @@ contract ReceiverStorage {
 
   address constant STATE_SYNCER_ROLE = 0x0000000000000000000000000000000000001001;
 
-
-//Receives the state from Matic 
   /**
-  automatic checkpoints occur every 10 mins by Matic validators?
-  data--
+  @dev This function allows Matic validators to provide Tellor's data. 
+  @param stateId is used by Matic validators to uniquely identify the state when the byte data was provided ???
+  @param data is the byte data with the specified output from an event on Ethereum
   */
   function onStateReceive(uint256 stateId, bytes calldata data) external {
     require(msg.sender == STATE_SYNCER_ROLE);
@@ -30,13 +33,20 @@ contract ReceiverStorage {
   }
   
   /**
-  Returns data saved on this contract that is received through onStateReceive to be read by centralized contract on Matic
+  @dev This function returns data saved on this contract that is received through onStateReceive to be read 
+  by centralized contract on Matic
+  @param _requestId is Tellor's requestId to retreive
+  @param _timestamp of value to retreive
   */
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256) {
     return(set[_requestId][_timestamp], values[_requestId][_timestamp]);
   }
 
-  function parse96BytesToThreeUint256(bytes memory data) public pure returns(uint256, uint256, uint256) {
+  /**
+  @dev This function allows the contract to decode the bytes data provided by Matic's validators
+  @param data is the byte data with the specified output from an event on Ethereum
+  */
+  function parse96BytesToThreeUint256(bytes memory data) internal pure returns(uint256, uint256, uint256) {
     uint256 parsed1;
     uint256 parsed2;
     uint256 parsed3;

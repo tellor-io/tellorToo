@@ -4,14 +4,19 @@ pragma solidity ^0.5.11;
 
 import "./UsingTellor.sol";
 
-/** IS this a contract or an interface???
-Does the StateSender address for Sender come from deploying this????
+/** 
+The sender address from Ethereum and receiver address deployed in Matic must
+be registered in Matic's sender contact on Ethereum for 
 */
 contract IStateSender {
   function syncState(address receiver, bytes calldata data) external;
   function register(address sender, address receiver) public;
 }
 
+/**
+@title Sender
+This contract helps send Tellor's data on Ethereum to Matic's Network
+*/
 contract Sender is UsingTellor {
     IStateSender public stateSender;
     address public receiver;
