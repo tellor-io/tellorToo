@@ -40,7 +40,7 @@ contract Sender is UsingTellor {
     function retrieveDataAndSend(uint256 _requestId, uint256 _timestamp) public {
         uint256 value = retrieveData(_requestId, _timestamp);
         require(value > 0);
-        stateSender.syncState(receiver, abi.encode(_requestId, _timestamp, value));
+        stateSender.syncState(receiver, abi.encode(_requestId, _timestamp, value, msg.sender));
     }
 
     /**
@@ -50,6 +50,6 @@ contract Sender is UsingTellor {
     function getCurrentValueAndSend(uint256 _requestId) public {
       (bool ifRetrieve, uint256 value, uint256 timestamp) = getCurrentValue(_requestId);
       require(ifRetrieve);
-      stateSender.syncState(receiver, abi.encode(_requestId, timestamp, value));
+      stateSender.syncState(receiver, abi.encode(_requestId, timestamp, value, msg.sender));
     }
 }

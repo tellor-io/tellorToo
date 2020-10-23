@@ -96,12 +96,13 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
     console.log('value before challenge', val2*1)
 
     await receiverStorage.testProvideData(1, _now, 8000)
+    console.log("data added to receiverStorage")
 
-    await centralizedOracle.challengeData(1, _now) //uint256 _timestamp, uint256 _challengeTimestamp
-    let dispute = await centralizedOracle.isUnderChallenge(1, _now)
-    assert(dispute == true, "Value is not under dispute")
-    let val1 = await centralizedOracle.retrieveData(1, _now)
-    assert(val1 == 8000, "value replaced with MockTellor's value")
+    // await centralizedOracle.challengeData(1, _now) //uint256 _timestamp, uint256 _challengeTimestamp
+    // let dispute = await centralizedOracle.isUnderChallenge(1, _now)
+    // assert(dispute == true, "Value is not under dispute")
+    // let val1 = await centralizedOracle.retrieveData(1, _now)
+    // assert(val1 == 8000, "value replaced with MockTellor's value")
    });
 
   // *********************Receiver******************************************/

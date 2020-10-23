@@ -48,14 +48,20 @@ contract CentralizedOracle  {
 
   IReceiverStorage public receiverStorage;
 
+    
+  address owner;
+  address oracle;
+  uint256 datasetCount;
+  uint256 feeBalance;
+  uint256 challengeFee;
+
   mapping (uint256 => mapping(uint256 => uint256)) public values;
   mapping (uint256 => mapping(uint256 => bool)) public locked;
+  mapping (uint256 => bool) public reqIdlocked;
   mapping (uint256 => mapping(uint256 => bool)) public isChallenged;
   mapping (uint256 => uint256[]) public timestamps;
   mapping (uint256 => Metadata) public metadata;
-  uint256 datasetCount;
-  address owner;
-  address oracle;
+
 
   struct Metadata {
     uint256 referenceRequestId;     // ID of corresponding mainnet data
@@ -73,6 +79,7 @@ contract CentralizedOracle  {
       owner = _owner;
       oracle = _oracle;
       datasetCount=0;
+      challengeFee = 1e18;
   }
 
   /**
@@ -106,41 +113,53 @@ contract CentralizedOracle  {
   }
 
 
+  event print(uint256 test);
   /**
   @dev Allows any party to challenged data provided by the centralized oracle
   @param _requestId is requestId to challenge
   @param _timestamp to challenge
   */
-  function challengeData(uint256 _requestId, uint256 _timestamp) public {
-      require(values[_requestId][_timestamp] > 0, 'The timestamp to be disputed does not exist');
+  function challengeData(uint256 _requestId, uint256 _timestamp) payable public {
+      //add dispute fee and goes to party that retreives data on ethereum
+      //require(address(this).transfer(challengeFee));
+      require(msg.sender.balance>challengeFee);
+      address(this).call.value(challengeFee);
+      //require(values[_requestId][_timestamp] > 0, "The value for timestamp to be disputed does not exist");
+     // emit print(4);
       uint now1 = now - (now % 1 hours);
+     // emit print(5);
+      require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,"The window to dispute has ended");
+      //emit print(6);
 
-      require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,
-        'The window to dispute has ended');
-
-      (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _timestamp);
-      require(retrieved, "Data cannot be challenged because it has not been received from Tellor's mainnet Ethereum");
       locked[_requestId][_timestamp] = true;
-      values[_requestId][_timestamp] = retrievedValue;
+      reqIdlocked[_requestId] = true;
+      feeBalance += challengeFee;
+     // emit print(9);
   }
 
+  function () external payable{
+  //fallback
+  }
   /**
   @dev Allows any party to revise the data challenged with Tellor's data.
   @param _requestId is requestId currently under challenge
   @param _timestamp under challenge
   */
-  function settleChallenge(uint256 _requestId, uint256 _timestamp) public {
+  function settleChallenge(uint256 _requestId, uint256 _timestamp) payable public {
     require(locked[_requestId][_timestamp]);
+    require(reqIdlocked[_requestId]);
     uint now1 = now - (now % 1 hours);
-    require(now1 - _timestamp > 2 hours, '1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed');
-
-    //Maybe loop through available timestamp values starting with _timestamp until one is found??? what are the odds that these will be the same?
-    (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _timestamp);
+    require(now1 - _timestamp > 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
     
-    require(retrieved, "Challenge cannot be settled because data has not been received from Tellor's mainnet Ethereum");
-    //require(_timestamp - tellorTimestamp < 3 hours, 'The available Tellor data is older than three hours from disputed timestamp');
+    (uint256 tellorTimestamp, uint256 value, address payable dataProvider) = receiverStorage.retreiveLatestValue(_requestId);
+    require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
+    emit print(7);
+
     locked[_requestId][_timestamp] = false;
-    values[_requestId][_timestamp] = retrievedValue;
+    reqIdlocked[_requestId] = false;
+    values[_requestId][_timestamp] = value;
+    address(this).call.value(challengeFee);
+    //address(this).transfer(dataProvider,challengeFee );
   }
 
   /**
@@ -150,8 +169,14 @@ contract CentralizedOracle  {
   @return the value 
   */ 
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(uint256){
+      //if requestId is locked then retreive only Tellor data
+      if (reqIdlocked[_requestId] == false) {
+        return values[_requestId][_timestamp];
+      } else {
       return values[_requestId][_timestamp];
+      }
   }
+
 
   /**
   @dev Allows the user to check if a value is being challenged
