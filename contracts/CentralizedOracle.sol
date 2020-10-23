@@ -34,7 +34,7 @@ import "./libraries/SafeMath.sol";
 //     }
 // }
 
-//Inerface right???
+
 contract IReceiverStorage {
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256);
 }
@@ -63,10 +63,10 @@ contract CentralizedOracle {
   }
 
   /**
-  Sets the receiverStorage to save data from, owner and oracle
+  @dev Sets the receiverStorage to save data from, owner and oracle
   @param _receiverStorage is the receiver address from Matic
   @param _owner is the centralized oracle owner
-  @param _oracle is Tellor's address??? or the central oracle address???
+  @param _oracle is the oracle address(can be the same as the _owner)
   */
   constructor(address _receiverStorage, address _owner, address _oracle) public {
       receiverStorage = IReceiverStorage(_receiverStorage);
@@ -76,12 +76,11 @@ contract CentralizedOracle {
   }
 
   /**
-  Saves data
+  @dev Allows the owner to create add a requestId
+  @param _referenceRequestId is the data type requestId that corresponds to Tellor's requestId on Ethereum
+  @param _timestampWindow is the amount of time a value is allowed to be challenged/disputed
   */
-  function newDataset(
-      uint256 _referenceRequestId,
-      uint256 _timestampWindow)
-      public {
+  function newDataset(uint256 _referenceRequestId, uint256 _timestampWindow) public {
       require(msg.sender == owner);
 
       metadata[datasetCount] = Metadata({
@@ -94,7 +93,9 @@ contract CentralizedOracle {
 
   /**
   @dev Allows centralized oracle to submit data
-  @param _requestId is tellors requestId
+  @param _requestId is requestId and should correspond to the requestId in tellor
+  @param _timestamp for the entry
+  @param _value is the current value for the requestId
   */
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
       require(msg.sender == oracle);
@@ -112,8 +113,6 @@ contract CentralizedOracle {
   waiting period before data is updated???
   should the challenge and settlement be done in two functions ???
   play challenge by delaying data on ethereum tellor---
-
-
   */
   function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
       require(values[_requestId][_timestamp] > 0);
@@ -126,23 +125,44 @@ contract CentralizedOracle {
   }
 
 
-  //How is the dispute settled??? is it settled in challengeData??? How are the functions below being used???
-  // Functions that allow 
+  /**
+  @dev Allows the user to retreive the value of the _requestId and _timestamp specified.
+  @param _requestId is the requestId to look up a value for
+  @param _timestamp is the timestamp to look up a value for
+  @return the value 
+  */ 
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(uint256){
       return values[_requestId][_timestamp];
   }
 
+  /**
+  @dev Allows the user to check if a value is being challenged
+  @param _requestId is the requestId to look up 
+  @param _timestamp is the timestamp to look up
+  @return true if it is being challenged 
+  */
   function isInDispute(uint256 _requestId, uint256 _timestamp) public view returns(bool){
       return isDisputed[_requestId][_timestamp];
   }
 
+  /**
+  @dev Allows the user to retreive the number of values saved for the specified requestId
+  @param _requestId is the requestId to look up 
+  @return the count of values saved for the specified requestId
+  */
   function getNewValueCountbyRequestId(uint256 _requestId) public view returns(uint) {
       return timestamps[_requestId].length;
   }
 
-  function getTimestampbyRequestIDandIndex(uint256 _requestId, uint256 index) public view returns(uint256) {
+  /**
+  @dev Allows the user to retreive the timestamp specified requestId and index
+  @param _requestId is the requestId to look up 
+  @param _index is the index to look up
+  @return the timestamp
+  */
+  function getTimestampbyRequestIDandIndex(uint256 _requestId, uint256 _index) public view returns(uint256) {
       uint len = timestamps[_requestId].length;
-      if(len == 0 || len <= index) return 0;
-      return timestamps[_requestId][index];
+      if(len == 0 || len <= _index) return 0;
+      return timestamps[_requestId][_index];
   }
 }
