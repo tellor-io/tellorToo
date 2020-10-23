@@ -37,8 +37,8 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
 
   it("Add new dataset to centralizedOracle and submit data ", async function() {
   	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
-    let _now1 = _now - 84000;
-    await centralizedOracle.newDataset( 1,  86400*3)  //  uint256 _timestampWindow)
+    let _now1 = _now - 1800;
+    await centralizedOracle.newDataset( 1,  3600)  //  can be disputed within one hour
     await centralizedOracle.submitData(1, _now1, 1000)
     let val1 = await centralizedOracle.retrieveData(1, _now1)
     await centralizedOracle.submitData(1, _now, 2000)
@@ -50,7 +50,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
   it("getNewValueCountbyRequestId ", async function() {
   	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
     let _now1 = _now - 84000;
-    await centralizedOracle.newDataset( 1,  86400*3) 
+    await centralizedOracle.newDataset( 1,  3600) 
     await centralizedOracle.submitData(1, _now1, 1000)
     await centralizedOracle.retrieveData(1, _now1)
     await centralizedOracle.submitData(1, _now, 2000)
@@ -61,7 +61,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
   it(" getTimestampbyRequestIDandIndex ", async function() {
   	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
     let _now1 = _now - 84000;
-    await centralizedOracle.newDataset( 1,  86400*3) 
+    await centralizedOracle.newDataset( 1,  3600) 
     await centralizedOracle.submitData(1, _now1, 1000)
     await centralizedOracle.retrieveData(1, _now1)
     await centralizedOracle.submitData(1, _now, 2000)
@@ -74,7 +74,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
   it(" getTimestampbyRequestIDandIndex ", async function() {
   	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
     let _now1 = _now - 84000;
-    await centralizedOracle.newDataset( 1,  86400*3) 
+    await centralizedOracle.newDataset( 1,  3600) 
     await centralizedOracle.submitData(1, _now1, 1000)
     await centralizedOracle.retrieveData(1, _now1)
     await centralizedOracle.submitData(1, _now, 2000)
@@ -84,45 +84,48 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
     assert(timestamp2==_now, "the timesamtp should be _now")
    });
 
-  it(" Test challengeData and isIndDispute", async function() {
-  	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
-    let _now1 = _now - 84000;
-    await centralizedOracle.newDataset( 1,  86400*3) 
-    await centralizedOracle.submitData(1, _now1, 1000)
-    await centralizedOracle.retrieveData(1, _now1)
-    await centralizedOracle.submitData(1, _now, 2000) 
-    let val2 = await centralizedOracle.retrieveData(1, _now1)
-    console.log('value before challenge', val2*1)
+  // it(" Test challengeData and isIndDispute", async function() {
+  // 	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
+  //   let _now1 = _now - 84000;
+  //   await centralizedOracle.newDataset( 1,  3600) 
+  //   await centralizedOracle.submitData(1, _now1, 1000)
+  //   await centralizedOracle.retrieveData(1, _now1)
+  //   await centralizedOracle.submitData(1, _now, 2000) 
+  //   let val2 = await centralizedOracle.retrieveData(1, _now1)
+  //   console.log('value before challenge', val2*1)
 
-    //fast forward time
-    await centralizedOracle.challengeData(1, _now, _now1) //uint256 _timestamp, uint256 _challengeTimestamp
-    let dispute = await centralizedOracle.isInDispute(1, _now)
-    assert(dispute == true, "Value is not under dispute")
-    let val1 = await centralizedOracle.retrieveData(1, _now)
-    assert(val1 == 6000, "value replaced with MockTellor's value")
-   });
+  //   //fast forward time
+  //   await centralizedOracle.challengeData(1, _now, _now1) //uint256 _timestamp, uint256 _challengeTimestamp
+  //   let dispute = await centralizedOracle.isInDispute(1, _now)
+  //   assert(dispute == true, "Value is not under dispute")
+  //   let val1 = await centralizedOracle.retrieveData(1, _now)
+  //   assert(val1 == 6000, "value replaced with MockTellor's value")
+  //  });
 
+  // *********************Receiver******************************************/
+  it("Test onStateReceive", async function() {
 
+  });
 
+    it("Test retrieveData", async function() {
 
- //centralizedOracle.newDataset(    uint256 _referenceRequestId,      uint256 _timestampWindow)
- //centralizedOracle.submitData(uint256 _requestId, uint256 _timestamp, uint256 _value)
- //centralizedOracle.challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp)
- //centralizedOracle.retrieveData(uint256 _requestId, uint256 _timestamp)
- //centralizedOracle.isInDispute(uint256 _requestId, uint256 _timestamp)
- //centralizedOracle.getNewValueCountbyRequestId(uint256 _requestId)
- //centralizedOracle.getTimestampbyRequestIDandIndex(uint256 _requestId, uint256 index)
+  });
 
 //onStateReceive(uint256 stateId, bytes calldata data)//how do i create a mock validator....???
-//parse96BytesToThreeUint256(bytes memory data)//why is this not internal?
+
 //receiverStorage.retrieveData(uint256 _requestId, uint256 _timestamp)
 
-
+  // *********************Sender******************************************/
 //sender.retrieveDataAndSend(uint256 _requestId, uint256 _timestamp)
 //sender.getCurrentValueAndSend(uint256 _requestId)
 
   it("Test ", async function() {
 
   });
+
+  it("Test ", async function() {
+
+  });
+
 
 });

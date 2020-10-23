@@ -43,7 +43,7 @@ contract IReceiverStorage {
 /**
 Ensure the request Id exists in Tellor before using it as a dispute mechanism
 */
-contract CentralizedOracle {
+contract CentralizedOracle  {
   using SafeMath for uint256;
 
   IReceiverStorage public receiverStorage;
@@ -98,32 +98,58 @@ contract CentralizedOracle {
   @param _value is the current value for the requestId
   */
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
-      require(msg.sender == oracle);
+      require(msg.sender == oracle, 'This address in not allowed to submitData');
       require(!locked[_requestId][_timestamp]);
 
       values[_requestId][_timestamp] = _value;
       timestamps[_requestId].push(_timestamp);
   }
 
-  /**
-  Allows parties to challenge centralize oracle's data and replace with Tellor Data...
-  could this be exploited, can anyone run this and replace with a Tellor value? 
-  Cost to challenge/cost to lying  ---centralized oracle staked?
-  should everyone be allowed to dispute/challenge
-  waiting period before data is updated???
-  should the challenge and settlement be done in two functions ???
-  play challenge by delaying data on ethereum tellor---
-  */
-  function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
-      require(values[_requestId][_timestamp] > 0);
-      require(_challengeTimestamp.max(_timestamp).sub(_challengeTimestamp.min(_timestamp)) <= metadata[_requestId].timestampWindow);
+ 
+  // function challengeData(uint256 _requestId, uint256 _timestamp, uint256 _challengeTimestamp) public {
+  //     require(values[_requestId][_timestamp] > 0);
+  //     require(_challengeTimestamp.max(_timestamp).sub(_challengeTimestamp.min(_timestamp)) <= metadata[_requestId].timestampWindow);
 
-      (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _challengeTimestamp);
-      require(retrieved, "Data cannot be challenged because it has not been retreived");
+  //     (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _challengeTimestamp);
+  //     require(retrieved, "Data cannot be challenged because it has not been retreived");
+  //     locked[_requestId][_timestamp] = true;
+  //     values[_requestId][_timestamp] = retrievedValue;
+  // }
+
+  /**
+  @dev Allows any party to challenged data provided by the centralized oracle
+  @param _requestId is requestId to challenge
+  @param _timestamp to challenge
+  */
+  function challengeData(uint256 _requestId, uint256 _timestamp) public {
+      require(values[_requestId][_timestamp] > 0, 'The timestamp to be disputed does not exist');
+      uint now = (now - (now % 1 hours);
+      uint len = timestamps[_requestId].length;
+      uint lastTimestamp = timestamps[_requestId][len-1];
+
+      require(now.sub(_timestamp) <= metadata[_requestId].timestampWindow,
+        'The window to dispute has ended');
+
+      (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _timestamp);
+      require(retrieved, "Data cannot be challenged because it has not been received from Tellor's mainnet Ethereum");
       locked[_requestId][_timestamp] = true;
       values[_requestId][_timestamp] = retrievedValue;
   }
 
+  /**
+  @dev Allows any party to revise the data challenged with Tellor's data.
+  @param _requestId is requestId currently under challenge
+  @param _timestamp under challenge
+  */
+  function settleChallenge(uint256 _requestId, uint256 _timestamp) public {
+    require(locked[_requestId][_timestamp]);
+    uint now = (now - (now % 1 hours);
+    require(now - _timestamp > 2 hours, '1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed');
+    (bool retrieved, uint256 retrievedValue) = receiverStorage.retrieveData(metadata[_requestId].referenceRequestId, _timestamp);
+    require(retrieved, "Challenge cannot be settled because data has not been received from Tellor's mainnet Ethereum");
+    locked[_requestId][_timestamp] = false;
+    values[_requestId][_timestamp] = retrievedValue;
+  }
 
   /**
   @dev Allows the user to retreive the value of the _requestId and _timestamp specified.
