@@ -12,6 +12,7 @@ interface IStateReceiver {
 This contract helps receive and decode Tellor's data from Ethereum on Matic's Network
 */
 contract ReceiverStorage {
+  event ValueRecieved(uint256 _stateId, uint _requestID, address _dataProvider, uint256 _value, uint256 _timestamp);
   mapping(uint256 => mapping(uint256 => address)) public dataProvider;
   mapping(uint256 => mapping(uint256 => uint256)) public values;
   mapping(uint256 => mapping(uint256 => bool)) public set;
@@ -26,18 +27,19 @@ contract ReceiverStorage {
   */
   function onStateReceive(uint256 stateId, bytes calldata data) external {
     require(msg.sender == STATE_SYNCER_ROLE);
-    (uint256 requestId, uint256 timestamp, uint256 value) = parse96BytesToThreeUint256(data);
-
+    (uint256 requestId, uint256 timestamp, uint256 value,address _dataProvider) = parse96BytesToThreeUint256(data);
+    dataProvider[requestId][timestamp]= _dataProvider;
     values[requestId][timestamp] = value;   // Save to values datastore
     timestamps[requestId].push(timestamp);
     set[requestId][timestamp] = true;
+    emit ValueRecieved(stateId, requestId,_dataProvider,value,timestamp);
   }
   
   /**
   @dev This function returns data saved on this contract that is received through onStateReceive to be read 
   by centralized contract on Matic
-  @param _requestId is Tellor's requestId to retreive
-  @param _timestamp of value to retreive
+  @param _requestId is Tellor's requestId to retrieve
+  @param _timestamp of value to retrieve
   */
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256, address) {
     return(set[_requestId][_timestamp], values[_requestId][_timestamp],dataProvider[_requestId][_timestamp]);
@@ -45,10 +47,10 @@ contract ReceiverStorage {
 
   /**
   @dev This function the latest timestamp and value for the specified requestId 
-  @param _requestId is Tellor's requestId to retreive
+  @param _requestId is Tellor's requestId to retrieve
   @return timestamp and value
   */
-  function retreiveLatestValue(uint256 _requestId) public returns(uint256, uint256, address) {
+  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address) {
     uint len = timestamps[_requestId].length;
     uint timestamp = timestamps[_requestId][len-1];
     values[_requestId][timestamp];
@@ -74,14 +76,14 @@ contract ReceiverStorage {
   }
 
 
-  /**
-  @dev This is a test function and will be commented out for production
-  */
-  function testProvideData(uint256 _requestId, uint256 _timestamp, uint256 _value, address _dataProvider) public  {
-    values[_requestId][_timestamp] = _value;   // Save to values datastore
-    timestamps[_requestId].push(_timestamp);
-    set[_requestId][_timestamp] = true;
-  }
+  // /**
+  // @dev This is a test function and will be commented out for production
+  // */
+  // function testProvideData(uint256 _requestId, uint256 _timestamp, uint256 _value, address _dataProvider) public  {
+  //   values[_requestId][_timestamp] = _value;   // Save to values datastore
+  //   timestamps[_requestId].push(_timestamp);
+  //   set[_requestId][_timestamp] = true;
+  // }
 
 
 

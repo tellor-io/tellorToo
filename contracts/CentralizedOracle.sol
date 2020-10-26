@@ -36,7 +36,8 @@ import "./libraries/SafeMath.sol";
 
 
 contract IReceiverStorage {
-  function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256);
+  function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256, address);
+  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address);
 }
 
 
@@ -120,7 +121,7 @@ contract CentralizedOracle  {
   @param _timestamp to challenge
   */
   function challengeData(uint256 _requestId, uint256 _timestamp) payable public {
-      //add dispute fee and goes to party that retreives data on ethereum
+      //add dispute fee and goes to party that retrieves data on ethereum
       //require(address(this).transfer(challengeFee));
       require(msg.sender.balance>challengeFee);
       address(this).call.value(challengeFee);
@@ -137,9 +138,6 @@ contract CentralizedOracle  {
      // emit print(9);
   }
 
-  function () external payable{
-  //fallback
-  }
   /**
   @dev Allows any party to revise the data challenged with Tellor's data.
   @param _requestId is requestId currently under challenge
@@ -151,25 +149,24 @@ contract CentralizedOracle  {
     uint now1 = now - (now % 1 hours);
     require(now1 - _timestamp > 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
     
-    (uint256 tellorTimestamp, uint256 value, address payable dataProvider) = receiverStorage.retreiveLatestValue(_requestId);
+    (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
     emit print(7);
 
     locked[_requestId][_timestamp] = false;
     reqIdlocked[_requestId] = false;
     values[_requestId][_timestamp] = value;
-    address(this).call.value(challengeFee);
-    //address(this).transfer(dataProvider,challengeFee );
+    dataProvider.call.value(challengeFee);
   }
 
   /**
-  @dev Allows the user to retreive the value of the _requestId and _timestamp specified.
+  @dev Allows the user to retrieve the value of the _requestId and _timestamp specified.
   @param _requestId is the requestId to look up a value for
   @param _timestamp is the timestamp to look up a value for
   @return the value 
   */ 
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(uint256){
-      //if requestId is locked then retreive only Tellor data
+      //if requestId is locked then retrieve only Tellor data
       if (reqIdlocked[_requestId] == false) {
         return values[_requestId][_timestamp];
       } else {
@@ -189,7 +186,7 @@ contract CentralizedOracle  {
   }
 
   /**
-  @dev Allows the user to retreive the number of values saved for the specified requestId
+  @dev Allows the user to retrieve the number of values saved for the specified requestId
   @param _requestId is the requestId to look up 
   @return the count of values saved for the specified requestId
   */
@@ -198,7 +195,7 @@ contract CentralizedOracle  {
   }
 
   /**
-  @dev Allows the user to retreive the timestamp specified requestId and index
+  @dev Allows the user to retrieve the timestamp specified requestId and index
   @param _requestId is the requestId to look up 
   @param _index is the index to look up
   @return the timestamp
