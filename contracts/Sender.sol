@@ -14,7 +14,7 @@ contract IStateSender {
 }
 
 contract MockSender {
-  event StateSynced(address receiver, bytes data);
+  event StateSynced(bytes data);
 
   struct Data{
     address receiver;
@@ -25,7 +25,7 @@ contract MockSender {
   
 
   function  syncState(address _receiver, bytes calldata _data) external returns(uint){
-    emit StateSynced(_receiver, _data);
+    emit StateSynced(_data);
     ids++;
     idToData[ids] = Data({
       receiver:_receiver,

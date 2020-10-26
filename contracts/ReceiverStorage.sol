@@ -27,14 +27,21 @@ contract ReceiverStorage {
   */
   function onStateReceive(uint256 stateId, bytes calldata data) external {
     require(msg.sender == STATE_SYNCER_ROLE);
-    (uint256 requestId, uint256 timestamp, uint256 value,address _dataProvider) = parse96BytesToThreeUint256(data);
+    internalOnStateRecieve(stateId, data);
+  }
+  
+  function internalOnStateRecieve(uint256 stateId, bytes memory data) internal{
+        (uint256 requestId, uint256 timestamp, uint256 value,address _dataProvider) = parse96BytesToThreeUint256(data);
     dataProvider[requestId][timestamp]= _dataProvider;
     values[requestId][timestamp] = value;   // Save to values datastore
     timestamps[requestId].push(timestamp);
     set[requestId][timestamp] = true;
     emit ValueRecieved(stateId, requestId,_dataProvider,value,timestamp);
   }
-  
+
+  function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
+    internalOnStateRecieve(stateId, data);
+  }
   /**
   @dev This function returns data saved on this contract that is received through onStateReceive to be read 
   by centralized contract on Matic

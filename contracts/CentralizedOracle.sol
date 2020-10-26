@@ -113,8 +113,6 @@ contract CentralizedOracle  {
       timestamps[_requestId].push(_timestamp);
   }
 
-
-  event print(uint256 test);
   /**
   @dev Allows any party to challenged data provided by the centralized oracle
   @param _requestId is requestId to challenge
@@ -126,16 +124,11 @@ contract CentralizedOracle  {
       require(msg.sender.balance>challengeFee);
       address(this).call.value(challengeFee);
       //require(values[_requestId][_timestamp] > 0, "The value for timestamp to be disputed does not exist");
-     // emit print(4);
       uint now1 = now - (now % 1 hours);
-     // emit print(5);
       require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,"The window to dispute has ended");
-      //emit print(6);
-
       locked[_requestId][_timestamp] = true;
       reqIdlocked[_requestId] = true;
       feeBalance += challengeFee;
-     // emit print(9);
   }
 
   /**
@@ -151,8 +144,6 @@ contract CentralizedOracle  {
     
     (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
-    emit print(7);
-
     locked[_requestId][_timestamp] = false;
     reqIdlocked[_requestId] = false;
     values[_requestId][_timestamp] = value;
