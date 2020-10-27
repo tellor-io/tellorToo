@@ -18,11 +18,11 @@ contract CentralizedOracle  {
   IReceiverStorage public receiverStorage;
 
     
-  address owner;
-  address oracle;
-  uint256 datasetCount;
-  uint256 feeBalance;
-  uint256 challengeFee;
+  address public owner;
+  address public oracle;
+  uint256 public datasetCount;
+  uint256 public feeBalance;
+  uint256 public challengeFee;
 
   mapping (uint256 => mapping(uint256 => uint256)) public values;
   mapping (uint256 => mapping(uint256 => bool)) public locked;
@@ -76,8 +76,8 @@ contract CentralizedOracle  {
   */
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
       require(msg.sender == oracle, 'This address in not allowed to submitData');
-      require(!locked[_requestId][_timestamp]);
-
+      require (_timestamp <= now, "Timestamp cannot be in the future");
+      require(!locked[_requestId][_timestamp], "Timestamp is locked due to a dispute");
       values[_requestId][_timestamp] = _value;
       timestamps[_requestId].push(_timestamp);
   }
@@ -88,11 +88,9 @@ contract CentralizedOracle  {
   @param _timestamp to challenge
   */
   function challengeData(uint256 _requestId, uint256 _timestamp) payable public {
-      //add dispute fee and goes to party that retrieves data on ethereum
-      //require(address(this).transfer(challengeFee));
-      require(msg.value > challengeFee, "fee should be correct");
+      require(msg.value == challengeFee, "fee should be correct");
       require(values[_requestId][_timestamp] > 0, "The value for timestamp to be disputed does not exist");
-      uint now1 = now - (now % 1 hours);
+      uint now1 = now;
       require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,"The window to dispute has ended");
       locked[_requestId][_timestamp] = true;
       reqIdlocked[_requestId] = true;
@@ -107,14 +105,14 @@ contract CentralizedOracle  {
   function settleChallenge(uint256 _requestId, uint256 _timestamp) payable public {
     require(locked[_requestId][_timestamp]);
     require(reqIdlocked[_requestId]);
-    uint now1 = now - (now % 1 hours);
+    uint now1 = now;
     require(now1 - _timestamp > 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
-    
     (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
     locked[_requestId][_timestamp] = false;
     reqIdlocked[_requestId] = false;
     values[_requestId][_timestamp] = value;
+    timestamps[_requestId].push(_timestamp);
     dataProvider.call.value(challengeFee);
   }
 
