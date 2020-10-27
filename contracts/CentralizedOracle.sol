@@ -3,38 +3,6 @@
 pragma solidity 0.5.16;
 import "./libraries/SafeMath.sol";
 
-// library SafeMath {
-
-//     function max(uint256 a, uint256 b) internal pure returns (uint256) {
-//         return a > b ? a : b;
-//     }
-
-//     function max(int256 a, int256 b) internal pure returns (uint256) {
-//         return a > b ? uint256(a) : uint256(b);
-//     }
-
-//     function min(uint256 a, uint256 b) internal pure returns (uint256) {
-//         return a < b ? a : b;
-//     }
-
-
-//     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-//         assert(b <= a);
-//         return a - b;
-//     }
-
-//     function sub(int256 a, int256 b) internal pure returns (int256 c) {
-//         if (b > 0) {
-//             c = a - b;
-//             assert(c <= a);
-//         } else {
-//             c = a - b;
-//             assert(c >= a);
-//         }
-//     }
-// }
-
-
 contract IReceiverStorage {
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256, address);
   function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address);
@@ -75,13 +43,14 @@ contract CentralizedOracle  {
   @param _owner is the centralized oracle owner
   @param _oracle is the oracle address(can be the same as the _owner)
   */
-  constructor(address _receiverStorage, address _owner, address _oracle) public {
+  constructor(address _receiverStorage, address _owner, address _oracle, uint _fee) public {
       receiverStorage = IReceiverStorage(_receiverStorage);
       owner = _owner;
       oracle = _oracle;
       datasetCount=0;
-      challengeFee = 1e18;
+      challengeFee = _fee;
   }
+
 
   /**
   @dev Allows the owner to create add a requestId
@@ -121,9 +90,8 @@ contract CentralizedOracle  {
   function challengeData(uint256 _requestId, uint256 _timestamp) payable public {
       //add dispute fee and goes to party that retrieves data on ethereum
       //require(address(this).transfer(challengeFee));
-      require(msg.sender.balance>challengeFee);
-      address(this).call.value(challengeFee);
-      //require(values[_requestId][_timestamp] > 0, "The value for timestamp to be disputed does not exist");
+      require(msg.value > challengeFee, "fee should be correct");
+      require(values[_requestId][_timestamp] > 0, "The value for timestamp to be disputed does not exist");
       uint now1 = now - (now % 1 hours);
       require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,"The window to dispute has ended");
       locked[_requestId][_timestamp] = true;
