@@ -9,6 +9,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
   let mockTellor
   let mockSender
   let usingTellor
+  let usingTellorMock
   let sender
   let receiverStorage
   let centralizedOracle
@@ -16,6 +17,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
   beforeEach("Setup contract for each test", async function() {
     mockTellor= await MockTellor.new([accounts[0], accounts[1],accounts[2],accounts[3],accounts[4]], [5000,5000,5000,5000,5000])
     mockSender = await MockSender.new();
+    usingTellorMock = await UsingTellor.new(mockTellor.address)
     receiverStorage = await ReceiverStorage.new()
   	sender = await Sender.new(mockTellor.address, mockSender.address, receiverStorage.address) 
     centralizedOracle = await CentralizedOracle.new(receiverStorage.address, accounts[0], accounts[0],web3.utils.toWei("10"))
@@ -213,14 +215,15 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
 
   it("Test retrieveDataAndSend", async function() {
     let res = await mockTellor.submitValue(58,2001,{from:accounts[5]});
-    console.log(res)
-    res = await sender.retrieveDataAndSend(58, res.receipt[1]);
+    let val = await usingTellorMock.getCurrentValue(58)
+    console.log(val)
+    res = await sender.retrieveDataAndSend(58, val[2]);
     console.log(res.receipt.rawLogs[0].data)
     let logdata = res.receipt.rawLogs[0].data
     logdata= logdata.substring(131)
     logdata = '0x' + logdata
     await receiverStorage.testOnStateRecieve(1,logdata);
-    let val = receiverStorage.retreiveLatestValue(55)
+    val = receiverStorage.retreiveLatestValue(55)
     console.log(val)
     assert(val[0] == 50001)
     assert(val[1] > 0)
