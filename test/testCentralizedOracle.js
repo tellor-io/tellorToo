@@ -142,6 +142,13 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
    it("test worst case scenario (broken centralized oracle, all disputes)", async function() {
     assert(0==1)
    });
+            it("test central oracle usingTellor functions", async function() {
+    assert(0==1)
+   });
+      it("test worst case scenario using Tellor)", async function() {
+    assert(0==1)
+   });
+
   // // *********************Receiver/ Sender******************************************/
   it("Test onStateReceive", async function() {
     await mockTellor.submitValue(55,50001,{from:accounts[3]});

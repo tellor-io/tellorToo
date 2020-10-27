@@ -25,7 +25,6 @@ contract CentralizedOracle  {
   uint256 public challengeFee;
 
   mapping (uint256 => mapping(uint256 => uint256)) public values;
-  mapping (uint256 => mapping(uint256 => bool)) public locked;
   mapping (uint256 => bool) public reqIdlocked;
   mapping (uint256 => mapping(uint256 => bool)) public isChallenged;
   mapping (uint256 => uint256[]) public timestamps;
@@ -77,7 +76,8 @@ contract CentralizedOracle  {
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
       require(msg.sender == oracle, 'This address in not allowed to submitData');
       require (_timestamp <= now, "Timestamp cannot be in the future");
-      require(!locked[_requestId][_timestamp], "Timestamp is locked due to a dispute");
+      require(!reqIdllocked[_requestId], "Requiest ID is locked due to a dispute");
+      require(values[_requestId][_timestamp])
       values[_requestId][_timestamp] = _value;
       timestamps[_requestId].push(_timestamp);
   }
@@ -92,7 +92,6 @@ contract CentralizedOracle  {
       require(values[_requestId][_timestamp] > 0, "The value for timestamp to be disputed does not exist");
       uint now1 = now;
       require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,"The window to dispute has ended");
-      locked[_requestId][_timestamp] = true;
       reqIdlocked[_requestId] = true;
       feeBalance += challengeFee;
   }
@@ -109,10 +108,8 @@ contract CentralizedOracle  {
     require(now1 - _timestamp > 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
     (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
-    locked[_requestId][_timestamp] = false;
     reqIdlocked[_requestId] = false;
     values[_requestId][_timestamp] = value;
-    timestamps[_requestId].push(_timestamp);
     dataProvider.call.value(challengeFee);
   }
 
@@ -123,12 +120,7 @@ contract CentralizedOracle  {
   @return the value 
   */ 
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(uint256){
-      //if requestId is locked then retrieve only Tellor data
-      if (reqIdlocked[_requestId] == false) {
-        return values[_requestId][_timestamp];
-      } else {
       return values[_requestId][_timestamp];
-      }
   }
 
 
