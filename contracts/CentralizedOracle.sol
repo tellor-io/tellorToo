@@ -76,8 +76,8 @@ contract CentralizedOracle  {
   function submitData(uint256 _requestId, uint256 _timestamp, uint256 _value) public {
       require(msg.sender == oracle, 'This address in not allowed to submitData');
       require (_timestamp <= now, "Timestamp cannot be in the future");
-      require(!reqIdllocked[_requestId], "Requiest ID is locked due to a dispute");
-      require(values[_requestId][_timestamp])
+      require(!reqIdlocked[_requestId], "Requiest ID is locked due to a dispute");
+      require(values[_requestId][_timestamp] == 0);
       values[_requestId][_timestamp] = _value;
       timestamps[_requestId].push(_timestamp);
   }
@@ -93,6 +93,7 @@ contract CentralizedOracle  {
       uint now1 = now;
       require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,"The window to dispute has ended");
       reqIdlocked[_requestId] = true;
+      isChallenged[_requestId][_timestamp] = true;
       feeBalance += challengeFee;
   }
 
@@ -102,7 +103,7 @@ contract CentralizedOracle  {
   @param _timestamp under challenge
   */
   function settleChallenge(uint256 _requestId, uint256 _timestamp) payable public {
-    require(locked[_requestId][_timestamp]);
+    require(isChallenged[_requestId][_timestamp]);
     require(reqIdlocked[_requestId]);
     uint now1 = now;
     require(now1 - _timestamp > 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
@@ -111,6 +112,7 @@ contract CentralizedOracle  {
     reqIdlocked[_requestId] = false;
     values[_requestId][_timestamp] = value;
     dataProvider.call.value(challengeFee);
+    isChallenged[_requestId][_timestamp] = false;
   }
 
   /**
@@ -130,7 +132,7 @@ contract CentralizedOracle  {
   @param _timestamp is the timestamp to look up
   @return true if it is being challenged 
   */
-  function isUnderChallenge(uint256 _requestId, uint256 _timestamp) public view returns(bool){
+  function isInDispute(uint256 _requestId, uint256 _timestamp) public view returns(bool){
       return isChallenged[_requestId][_timestamp];
   }
 
