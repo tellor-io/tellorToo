@@ -74,8 +74,9 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
   //  });
 
   it(" Test challengeData and isUnderChallenge and settle challenge", async function() {
-  	let _now  =  (Date.now() - (Date.now() % 84000))/1000;
-    await centralizedOracle.newDataset( 1,  3600) 
+  	let _now  =  await mockTellor.getTime()
+    console.log(_now)
+    await centralizedOracle.newDataset( 1,3600) 
     await centralizedOracle.submitData(1, _now, 1000)
     let val =await centralizedOracle.retrieveData(1, _now)
     assert(val == 1000)

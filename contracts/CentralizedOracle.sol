@@ -28,13 +28,9 @@ contract CentralizedOracle  {
   mapping (uint256 => bool) public reqIdlocked;
   mapping (uint256 => mapping(uint256 => bool)) public isChallenged;
   mapping (uint256 => uint256[]) public timestamps;
-  mapping (uint256 => Metadata) public metadata;
+  mapping (uint256 => uint256) public timestampWindow;
+  uint256[] public supportedReqIds;
 
-
-  struct Metadata {
-    uint256 referenceRequestId;     // ID of corresponding mainnet data
-    uint256 timestampWindow;        // Max distance from which a challenge datapoint applies to a centralized datapoint
-  }
 
   /**
   @dev Sets the receiverStorage to save data from, owner and oracle
@@ -49,6 +45,7 @@ contract CentralizedOracle  {
       datasetCount=0;
       challengeFee = _fee;
   }
+ 
 
 
   /**
@@ -59,12 +56,14 @@ contract CentralizedOracle  {
   function newDataset(uint256 _referenceRequestId, uint256 _timestampWindow) public {
       require(msg.sender == owner);
 
-      metadata[datasetCount] = Metadata({
-          referenceRequestId: _referenceRequestId,
-          timestampWindow: _timestampWindow
-      });
+      timestampWindow[_referenceRequestId] =_timestampWindow;
 
+      supportedReqIds.push(_referenceRequestId);
       datasetCount++;
+  }
+
+  function getSupportedIDs() public view returns(uint256[] memory){
+    return supportedReqIds;
   }
 
   /**
@@ -82,6 +81,7 @@ contract CentralizedOracle  {
       timestamps[_requestId].push(_timestamp);
   }
 
+  event Print(uint,uint,uint);
   /**
   @dev Allows any party to challenged data provided by the centralized oracle
   @param _requestId is requestId to challenge
@@ -91,7 +91,7 @@ contract CentralizedOracle  {
       require(msg.value == challengeFee, "fee should be correct");
       require(values[_requestId][_timestamp] > 0, "The value for timestamp to be disputed does not exist");
       uint now1 = now;
-      require(now1.sub(_timestamp) <= metadata[_requestId].timestampWindow,"The window to dispute has ended");
+      require(now1.sub(_timestamp) <= timestampWindow[_requestId],"The window to dispute has ended");
       reqIdlocked[_requestId] = true;
       isChallenged[_requestId][_timestamp] = true;
       feeBalance += challengeFee;

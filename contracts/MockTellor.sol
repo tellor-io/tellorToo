@@ -117,4 +117,8 @@ contract MockTellor {
         if(len == 0 || len <= index) return 0;
         return timestamps[_requestId][index];
     }
+
+    function getTime() public view returns(uint256){
+        return now;
+    }
 }
