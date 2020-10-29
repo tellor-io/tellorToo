@@ -4,12 +4,12 @@
 
 /******************************************************************************************/
 
-const MockTellor = artifacts.require('MockTellor.sol')
-const UsingTellor = artifacts.require('UsingTellor.sol')
-const MockSender = artifacts.require('MockSender')
-const Sender = artifacts.require('Sender.sol')
-const ReceiverStorage = artifacts.require('ReceiverStorage.sol')
-const CentralizedOracle = artifacts.require('CentralizedOracle.sol')
+const MockTellor = artifacts.require('./MockTellor')
+const UsingTellor = artifacts.require('./UsingTellor')
+const MockSender = artifacts.require("./MockSender")
+const Sender = artifacts.require('./Sender')
+const ReceiverStorage = artifacts.require('./ReceiverStorage')
+const CentralizedOracle = artifacts.require('./CentralizedOracle')
 
 
 
@@ -30,10 +30,6 @@ var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2
 // matic.eth.accounts.wallet.add(privateKey)
 // main.eth.accounts.wallet.add(privateKey)
 
-
-const MockSender = artifacts.require("./MockSender.sol")
-const ReceiverStorage = artifacts.require("./ReceiverStorage.sol")
-const CentralizedOracle = artifacts.require("./CentralizedOracle.sol") 
 
 
 // function sleep_s(secs) {
