@@ -111,7 +111,7 @@ const helpers = require("./helpers/test_helpers");
     }
    });
 
-    it("test challenge then resumption of optimistic oracle and assert throw of locked period", async function() {
+  it("test challenge then resumption of optimistic oracle and assert throw of locked period", async function() {
     let _now  =  await mockTellor.getTime()
     await centralizedOracle.newDataset( 1,  3600) 
     await centralizedOracle.submitData(1, _now, 1000)
@@ -133,7 +133,7 @@ const helpers = require("./helpers/test_helpers");
     await centralizedOracle.settleChallenge(1,_now);
     val = await centralizedOracle.retrieveData(1, _now)
     assert(val == 8000)
-        await centralizedOracle.submitData(1, _now-10, 4000)
+    await centralizedOracle.submitData(1, _now-10, 4000)
     val =await centralizedOracle.retrieveData(1, _now-10)
     assert(val == 4000)
 
@@ -151,10 +151,10 @@ const helpers = require("./helpers/test_helpers");
       val =await centralizedOracle.retrieveData(1, _now)
       assert(val == 1000*i)
       await mockTellor.submitValue(1,8000*i);
-     res = await sender.getCurrentValueAndSend(1);
-    logdata = res.receipt.rawLogs[0].data
-    logdata= logdata.substring(131)
-    logdata = '0x' + logdata
+      res = await sender.getCurrentValueAndSend(1);
+      logdata = res.receipt.rawLogs[0].data
+      logdata= logdata.substring(131)
+      logdata = '0x' + logdata
       await receiverStorage.testOnStateRecieve(1,logdata);
       await centralizedOracle.challengeData(1, _now,{from:accounts[4],value:web3.utils.toWei("10")}) 
       dispute = await centralizedOracle.isInDispute(1, _now)
@@ -166,7 +166,6 @@ const helpers = require("./helpers/test_helpers");
       await centralizedOracle.settleChallenge(1,_now);
       val = await centralizedOracle.retrieveData(1, _now)
       assert(val == 8000*i)
-
     }
    });
    it("test central oracle usingTellor functions", async function() {
@@ -180,7 +179,6 @@ const helpers = require("./helpers/test_helpers");
       val = await usingTellor.getNewValueCountbyRequestId(1)
       assert(val == 1)
       val = await usingTellor.getTimestampbyRequestIDandIndex(1,0)
-            console.log(val*1 - 0, _now*1-0)
       assert(val - _now == 0)
       val = await usingTellor.getCurrentValue(1)
       assert(val[0])
@@ -208,21 +206,20 @@ const helpers = require("./helpers/test_helpers");
       assert(val == 1000*i)
       await mockTellor.submitValue(1,8000*i);
        res = await sender.getCurrentValueAndSend(1);
-     logdata = res.receipt.rawLogs[0].data
-    logdata= logdata.substring(131)
-    logdata = '0x' + logdata
+      logdata = res.receipt.rawLogs[0].data
+      logdata= logdata.substring(131)
+      logdata = '0x' + logdata
       await receiverStorage.testOnStateRecieve(1,logdata);
       await centralizedOracle.challengeData(1, _now,{from:accounts[i],value:web3.utils.toWei("10")}) 
       dispute = await centralizedOracle.isInDispute(1, _now)
       assert(dispute == true, "Value is not under dispute")
       val = await centralizedOracle.retrieveData(1, _now)
       assert(val == 0," no value should be available")
-            await helpers.expectThrow(centralizedOracle.submitData(1,_now+ 1000,2000))
+      await helpers.expectThrow(centralizedOracle.submitData(1,_now+ 1000,2000))
       await helpers.advanceTime(3600)
       await centralizedOracle.settleChallenge(1,_now);
       val = await centralizedOracle.retrieveData(1, _now)
       assert(val == 8000*i)
-
       val = await usingTellor.retrieveData(1,_now);
       assert(val == 8000*i)
       val = await usingTellor.isInDispute(1,_now)
@@ -242,7 +239,6 @@ const helpers = require("./helpers/test_helpers");
       assert(val[0])
       assert(val[1] == 8000*i)
       assert(val[2] -_now ==0)
-
     }
    });
 
@@ -250,13 +246,11 @@ const helpers = require("./helpers/test_helpers");
   it("Test onStateReceive", async function() {
     await mockTellor.submitValue(55,50001,{from:accounts[3]});
     let res = await sender.getCurrentValueAndSend(55,{from:accounts[3]});
-    console.log(res.receipt.rawLogs[0].data)
     let logdata = res.receipt.rawLogs[0].data
     logdata= logdata.substring(131)
     logdata = '0x' + logdata
     await receiverStorage.testOnStateRecieve(1,logdata);
     let val = await receiverStorage.retrieveLatestValue(55)
-    console.log(val)
     assert(val[1] == 50001, "Value should be correct")
     assert(val[0] > 0, "Timestamp should be correct")
     assert(val[2] == accounts[3], "Dataprovider should be correct")
@@ -275,12 +269,10 @@ const helpers = require("./helpers/test_helpers");
     logdata = '0x' + logdata
     await receiverStorage.testOnStateRecieve(1,logdata);
     val = await receiverStorage.retrieveLatestValue(58)
-    console.log(val)
     assert(val[1] == 2001, "Value should be correct")
     assert(val[0] > 0, "Timestamp should be correct")
     assert(val[2] == accounts[5], "Data provider should be correct")
     val = await receiverStorage.retrieveData(58,val[0])
-    console.log(val)
     assert(val[0] == true)
     assert(val[1] == 2001)
     assert(val[2] == accounts[5])

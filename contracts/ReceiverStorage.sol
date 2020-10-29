@@ -30,8 +30,13 @@ contract ReceiverStorage {
     internalOnStateRecieve(stateId, data);
   }
   
+  /**
+  @dev Internal function allows Matic validators to provide Tellor's data. 
+  @param stateId is used by Matic validators to uniquely identify the state when the byte data was provided ???
+  @param data is the byte data with the specified output from an event on Ethereum
+  */
   function internalOnStateRecieve(uint256 stateId, bytes memory data) internal{
-        (uint256 requestId, uint256 timestamp, uint256 value,address _dataProvider) = parse96BytesToThreeUint256(data);
+    (uint256 requestId, uint256 timestamp, uint256 value,address _dataProvider) = parse96BytesToThreeUint256(data);
     dataProvider[requestId][timestamp]= _dataProvider;
     values[requestId][timestamp] = value;   // Save to values datastore
     timestamps[requestId].push(timestamp);
@@ -80,18 +85,10 @@ contract ReceiverStorage {
   }
 
 
-  // /**
-  // @dev This is a test function and will be commented out for production
-  // */
-  // function testProvideData(uint256 _requestId, uint256 _timestamp, uint256 _value, address _dataProvider) public  {
-  //   values[_requestId][_timestamp] = _value;   // Save to values datastore
-  //   timestamps[_requestId].push(_timestamp);
-  //   set[_requestId][_timestamp] = true;
-  // }
-  /*Comment this out when deploying*/
+  /**
+  @dev This is a test function and will be commented out for production
+  */
   function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
     internalOnStateRecieve(stateId, data);
   }
-
-
 }

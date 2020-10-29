@@ -13,6 +13,7 @@ contract IStateSender {
   function register(address sender, address receiver) public;
 }
 
+/*This is a Mock Sender contract to mimic the Matic validator functions*/
 contract MockSender {
   event StateSynced(bytes data);
 
