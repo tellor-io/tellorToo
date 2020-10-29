@@ -84,11 +84,11 @@ contract ReceiverStorage {
     return(parsed1, parsed2, parsed3, parsed4);
   }
 
-
+  /**********************************Test function, not included in production*********************/
   /**
   @dev This is a test function and will be commented out for production
   */
-  function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
-    internalOnStateRecieve(stateId, data);
-  }
+  // function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
+  //   internalOnStateRecieve(stateId, data);
+  // }
 }

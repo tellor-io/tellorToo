@@ -84,10 +84,22 @@ module.exports = {
       network_id: "*",
       gas: 6000000, // default ganache-cli value
     },
+
+    ropsten: {
+      provider: () =>
+        new HDWalletProvider(
+          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+          `https://ropsten.infura.io/v3/${accessToken}`
+        ),
+      network_id: 3,
+      gas: 10000000,
+      gasPrice: 80000000000,
+    },
+  
     rinkeby: {
       provider: () =>
         new HDWalletProvider(
-          "3a10b4bc1258e8bfefb95b498fb8c0f0cd6964a811eabca87df5630bcacd7216",
+          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
           `https://rinkeby.infura.io/v3/${accessToken}`
         ),
       network_id: 4,
@@ -104,6 +116,16 @@ module.exports = {
       gas: 10000000,
       gasPrice: 85000000000,
     },
+
+    maticTestnet: {
+    provider: () => new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`),
+      network_id: "*",       
+      gas: 8000000,    
+      gasPrice: 3000000000,    
+      confirmations: 2,   
+      timeoutBlocks: 200,  
+      skipDryRun: true     
+    },  
   },
 
 
@@ -124,12 +146,16 @@ module.exports = {
       // version: "0.5.1",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
+        optimizer: {
+          enabled: true,
+          runs: 1000000
+        },
       //  evmVersion: "byzantium"
       // }
     },
   },
+
+
+
+
 };
