@@ -39,9 +39,6 @@ contract ReceiverStorage {
     emit ValueRecieved(stateId, requestId,_dataProvider,value,timestamp);
   }
 
-  function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
-    internalOnStateRecieve(stateId, data);
-  }
   /**
   @dev This function returns data saved on this contract that is received through onStateReceive to be read 
   by centralized contract on Matic
@@ -91,7 +88,10 @@ contract ReceiverStorage {
   //   timestamps[_requestId].push(_timestamp);
   //   set[_requestId][_timestamp] = true;
   // }
-
+  /*Comment this out when deploying*/
+  function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
+    internalOnStateRecieve(stateId, data);
+  }
 
 
 }

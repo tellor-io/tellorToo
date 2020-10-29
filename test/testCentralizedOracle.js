@@ -4,6 +4,7 @@ const Sender = artifacts.require("./Sender.sol");
 const MockSender = artifacts.require("./MockSender.sol")
 const ReceiverStorage = artifacts.require("./ReceiverStorage.sol"); 
 const CentralizedOracle = artifacts.require("./CentralizedOracle.sol"); 
+const helpers = require("./helpers/test_helpers");
 
  contract("CentralizedOracle Contract fx testing", function(accounts) {
   let mockTellor
@@ -73,47 +74,46 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
   //   assert(timestamp2==_now, "the timesamtp should be _now")
   //  });
 
-  it(" Test challengeData and isUnderChallenge and settle challenge", async function() {
-  	let _now  =  await mockTellor.getTime()
-    console.log(_now)
-    await centralizedOracle.newDataset( 1,3600) 
-    await centralizedOracle.submitData(1, _now, 1000)
-    let val =await centralizedOracle.retrieveData(1, _now)
-    assert(val == 1000)
-    await centralizedOracle.challengeData(1, _now,{from:accounts[2],value:web3.utils.toWei("10")}) 
-    let dispute = await centralizedOracle.isUnderChallenge(1, _now)
-    assert(dispute == true, "Value is not under dispute")
-    val = await centralizedOracle.retrieveData(1, _now)
-    assert(val == 0," no value should be available")
-    await mockTellor.submitValue(1,8000);
-    let res = await sender.getCurrentValueAndSend(1);
-    console.log(res.receipt.rawLogs[0].data)
-    let logdata = res.receipt.rawLogs[0].data
-    logdata= logdata.substring(131)
-    logdata = '0x' + logdata
-    await receiverStorage.testOnStateRecieve(1,logdata);
-    //uint256 _timestamp, uint256 _challengeTimestamp
-    await centralizedOracle.settleChallenge(1,_now);
-    val = await centralizedOracle.retrieveData(1, _now)
-    assert(val == 8000)
-   });
+  // it(" Test challengeData and isInDispute and settle challenge", async function() {
+  // 	let _now  =  await mockTellor.getTime()
+  //   console.log(_now)
+  //   await centralizedOracle.newDataset( 1,3600) 
+  //   await centralizedOracle.submitData(1, _now, 1000)
+  //   let val =await centralizedOracle.retrieveData(1, _now)
+  //   assert(val == 1000)
+  //   await centralizedOracle.challengeData(1, _now,{from:accounts[2],value:web3.utils.toWei("10")}) 
+  //   let dispute = await centralizedOracle.isInDispute(1, _now)
+  //   assert(dispute == true, "Value is not under dispute")
+  //   val = await centralizedOracle.retrieveData(1, _now)
+  //   assert(val == 0," no value should be available")
+  //   await mockTellor.submitValue(1,8000);
+  //   let res = await sender.getCurrentValueAndSend(1);
+  //   let logdata = res.receipt.rawLogs[0].data
+  //   logdata= logdata.substring(131)
+  //   logdata = '0x' + logdata
+  //   await receiverStorage.testOnStateRecieve(1,logdata);
+  //   await helpers.advanceTime(3600)
+  //   await centralizedOracle.settleChallenge(1,_now);
+  //   val = await centralizedOracle.retrieveData(1, _now)
+  //   assert(val == 8000)
+  //  });
 
-  it("test three data points", async function() {
-    let _now  =  (Date.now() - (Date.now() % 84000))/1000;
-    await centralizedOracle.newDataset( 1,  3600) 
-    await centralizedOracle.newDataset( 2,  60) 
-    await centralizedOracle.newDataset( 3,  360) 
-    for(var i=1;i<=3;i++){
-      await centralizedOracle.submitData(i, _now + 1000 * i, 1000* i);
-    }
-    for(var i=1;i<=3;i++){
-      val = await centralizedOracle.retrieveData(i, _now + 1000 * i);
-      assert(val == 1000*i,"value should be correct");
-    }
-   });
+  // it("test three data points", async function() {
+  //   let _now  =  await mockTellor.getTime()
+  //   await centralizedOracle.newDataset( 1,  3600) 
+  //   await centralizedOracle.newDataset( 2,  60) 
+  //   await centralizedOracle.newDataset( 3,  360) 
+  //   for(var i=1;i<=3;i++){
+  //     await centralizedOracle.submitData(i, _now - 1000 * i, 1000* i);
+  //   }
+  //   for(var i=1;i<=3;i++){
+  //     val = await centralizedOracle.retrieveData(i, _now - 1000 * i);
+  //     assert(val == 1000*i,"value should be correct");
+  //   }
+  //  });
 
     it("test challenge then resumption of optimistic oracle and assert throw of locked period", async function() {
-    let _now  =  (Date.now() - (Date.now() % 84000))/1000;
+    let _now  =  await mockTellor.getTime()
     await centralizedOracle.newDataset( 1,  3600) 
     await centralizedOracle.submitData(1, _now, 1000)
     let val =await centralizedOracle.retrieveData(1, _now)
@@ -124,26 +124,29 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
     console.log(res.receipt.rawLogs)
     let logdata = res.receipt.rawLogs[0].data
     await receiverStorage.testOnStateRecieve(1,logdata);
-    await centralizedOracle.challengeData(1, _now) //uint256 _timestamp, uint256 _challengeTimestamp
-    let dispute = await centralizedOracle.isUnderChallenge(1, _now)
+    await centralizedOracle.challengeData(1, _now,{from:accounts[2],value:web3.utils.toWei("10")}) 
+    let dispute = await centralizedOracle.isInDispute(1, _now)
     assert(dispute == true, "Value is not under dispute")
     val = await centralizedOracle.retrieveData(1, _now)
     assert(val1 == nil," no value should be available")
+    await helpers.advanceTime(3600)
     await centralizedOracle.settleChallenge(1,_now1);
     val = await centralizedOracle.retrieveData(1, _now)
     assert(val == 8000)
     await expectThrow(centralizedOracle.submitData(1,_now+ 1000,2000))
-    await helpers.advanceTime(3600)
         await centralizedOracle.submitData(1, _now+1000, 4000)
     val =await centralizedOracle.retrieveData(1, _now+1000)
     assert(val == 4000)
 
    });
    it("test worst case scenario (broken centralized oracle, all disputes)", async function() {
+    let val
+    let res
+    let logdata
+    let dispute
     let _now
-    let val,res,logdata,dispute
     for(var i=1;i<5;i++){
-      _now  =  (Date.now() - (Date.now() % 84000))/1000 + 3600*i;
+      _now  =  await mockTellor.getTime()
       await centralizedOracle.newDataset( 1,  3600) 
       await centralizedOracle.submitData(1, _now, 1000*i)
       val =await centralizedOracle.retrieveData(1, _now)
@@ -152,8 +155,8 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
       res = await sender.getCurrentValueAndSend(1);
       logdata = res.receipt.rawLogs[0].data
       await receiverStorage.testOnStateRecieve(1,logdata);
-      await centralizedOracle.challengeData(1, _now) //uint256 _timestamp, uint256 _challengeTimestamp
-      dispute = await centralizedOracle.isUnderChallenge(1, _now)
+      await centralizedOracle.challengeData(1, _now,{from:accounts[2],value:web3.utils.toWei("10")}) 
+      dispute = await centralizedOracle.isInDispute(1, _now)
       assert(dispute == true, "Value is not under dispute")
       val = await centralizedOracle.retrieveData(1, _now)
       assert(val1 == nil," no value should be available")
@@ -165,7 +168,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
     }
    });
    it("test central oracle usingTellor functions", async function() {
-      _now  =  (Date.now() - (Date.now() % 84000))/1000 + 3600;
+      let _now  =  await mockTellor.getTime()
       await centralizedOracle.newDataset( 1,  3600) 
       await centralizedOracle.submitData(1, _now, 1000)
       let val = await usingTellor.retrieveData(1,_now);
@@ -189,20 +192,23 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
       assert(val[2] == _now)
    });
    it("test worst case scenario using Tellor)", async function() {
-     let _now
-    let val,res,logdata,dispute
     for(var i=1;i<5;i++){
-      _now  =  (Date.now() - (Date.now() % 84000))/1000 + 3600*i;
+          let val
+      let res
+      let logdata
+      let dispute
+      let _now
+      _now  =  await mockTellor.getTime()
       await centralizedOracle.newDataset( 1,  3600) 
       await centralizedOracle.submitData(1, _now, 1000*i)
-      val =await centralizedOracle.retrieveData(1, _now)
+      val = await centralizedOracle.retrieveData(1, _now)
       assert(val == 1000*i)
       await mockTellor.submitValue(1,8000*i);
       res = await sender.getCurrentValueAndSend(1);
       logdata = res.receipt.rawLogs[0].data
       await receiverStorage.testOnStateRecieve(1,logdata);
-      await centralizedOracle.challengeData(1, _now) //uint256 _timestamp, uint256 _challengeTimestamp
-      dispute = await centralizedOracle.isUnderChallenge(1, _now)
+      await centralizedOracle.challengeData(1, _now,{from:accounts[2],value:web3.utils.toWei("10")}) 
+      dispute = await centralizedOracle.isInDispute(1, _now)
       assert(dispute == true, "Value is not under dispute")
       val = await centralizedOracle.retrieveData(1, _now)
       assert(val1 == nil," no value should be available")
@@ -211,7 +217,7 @@ const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
       assert(val == 8000)
       await expectThrow(centralizedOracle.submitData(1,_now+ 1000,2000))
       await helpers.advanceTime(3600)
-      let val = await usingTellor.retrieveData(1,_now);
+      val = await usingTellor.retrieveData(1,_now);
       assert(val == 1000)
       val = await usingTellor.isInDispute(1,_now)
       assert(!val)

@@ -122,6 +122,9 @@ contract CentralizedOracle  {
   @return the value 
   */ 
   function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(uint256){
+      if (isChallenged[_requestId][_timestamp]){
+        return 0;
+      }
       return values[_requestId][_timestamp];
   }
 
