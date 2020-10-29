@@ -6,10 +6,16 @@
 
 const MockTellor = artifacts.require('MockTellor.sol')
 const UsingTellor = artifacts.require('UsingTellor.sol')
+const MockSender = artifacts.require('MockSender')
+const Sender = artifacts.require('Sender.sol')
+const ReceiverStorage = artifacts.require('ReceiverStorage.sol')
+const CentralizedOracle = artifacts.require('CentralizedOracle.sol')
+
+
 
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider("3a10b4bc1258e8bfefb95b498fb8c0f0cd6964a811eabca87df5630bcacd7216", `https://rpc-mumbai.matic.today`));
+var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
 
 
 // const Web3 = require('web3')
