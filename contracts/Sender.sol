@@ -46,6 +46,7 @@ This contract helps send Tellor's data on Ethereum to Matic's Network
 */
 contract Sender is UsingTellor {
     IStateSender public stateSender;
+    event DataSent(uint _requestId, uint _timestamp, uint _value, address _sender);    
     address public receiver;
 
     /**
@@ -68,6 +69,7 @@ contract Sender is UsingTellor {
         uint256 value = retrieveData(_requestId, _timestamp);
         require(value > 0);
         stateSender.syncState(receiver, abi.encode(_requestId, _timestamp, value, msg.sender));
+        emit DataSent(_requestId, _timestamp, value, msg.sender);
     }
 
     /**
@@ -78,5 +80,6 @@ contract Sender is UsingTellor {
       (bool ifRetrieve, uint256 value, uint256 timestamp) = getCurrentValue(_requestId);
       require(ifRetrieve);
       stateSender.syncState(receiver, abi.encode(_requestId, timestamp, value, msg.sender));
+      emit DataSent(_requestId, timestamp, value, msg.sender);
     }
 }

@@ -33,6 +33,12 @@ contract CentralizedOracle  {
   mapping (uint256 => uint256) public timestampWindow;
   uint256[] public supportedReqIds;
 
+  event NewDataset(uint256 _referenceRequestId, uint256 _timestampWindow);
+  event DataSubmitted(uint256 _requestId, uint256 _timestamp, uint256 _value);
+  event DataChallenged(uint256 _requestId, uint256 _timestamp);
+  event ChallengeSettled(uint256 _requestId, uint256 _timestamp);
+  
+
 
   /**
   @dev Sets the receiverStorage to save data from, owner and oracle
@@ -62,6 +68,7 @@ contract CentralizedOracle  {
 
       supportedReqIds.push(_referenceRequestId);
       datasetCount++;
+      emit NewDataset(_referenceRequestId, _timestampWindow);
   }
 
   function getSupportedIDs() public view returns(uint256[] memory){
@@ -81,9 +88,9 @@ contract CentralizedOracle  {
       require(values[_requestId][_timestamp] == 0);
       values[_requestId][_timestamp] = _value;
       timestamps[_requestId].push(_timestamp);
+      emit DataSubmitted(_requestId, _timestamp,_value);
   }
 
-  event Print(uint,uint,uint);
   /**
   @dev Allows any party to challenged data provided by the centralized oracle
   @param _requestId is requestId to challenge
@@ -98,6 +105,7 @@ contract CentralizedOracle  {
       isChallenged[_requestId][_timestamp] = true;
       feeBalance += challengeFee;
       challengeCount[_requestId]++;
+      emit DataChallenged(_requestId,_timestamp);
   }
 
   /**
@@ -118,6 +126,7 @@ contract CentralizedOracle  {
     values[_requestId][_timestamp] = value;
     dataProvider.call.value(challengeFee);
     isChallenged[_requestId][_timestamp] = false;
+    emit ChallengeSettled(_requestId,_timestamp);
   }
 
   /**
