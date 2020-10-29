@@ -27,6 +27,8 @@ contract CentralizedOracle  {
   mapping (uint256 => mapping(uint256 => uint256)) public values;
   mapping (uint256 => bool) public reqIdlocked;
   mapping (uint256 => mapping(uint256 => bool)) public isChallenged;
+  mapping (uint => uint) challengeCount;
+  
   mapping (uint256 => uint256[]) public timestamps;
   mapping (uint256 => uint256) public timestampWindow;
   uint256[] public supportedReqIds;
@@ -95,6 +97,7 @@ contract CentralizedOracle  {
       reqIdlocked[_requestId] = true;
       isChallenged[_requestId][_timestamp] = true;
       feeBalance += challengeFee;
+      challengeCount[_requestId]++;
   }
 
   /**
@@ -103,13 +106,15 @@ contract CentralizedOracle  {
   @param _timestamp under challenge
   */
   function settleChallenge(uint256 _requestId, uint256 _timestamp) payable public {
-    require(isChallenged[_requestId][_timestamp]);
-    require(reqIdlocked[_requestId]);
+    require(isChallenged[_requestId][_timestamp], "Timestamp should be in dispute");
     uint now1 = now;
     require(now1 - _timestamp > 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
     (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
-    reqIdlocked[_requestId] = false;
+    challengeCount[_requestId]--;
+    if(challengeCount[_requestId] == 0){
+      reqIdlocked[_requestId] = false;
+    }
     values[_requestId][_timestamp] = value;
     dataProvider.call.value(challengeFee);
     isChallenged[_requestId][_timestamp] = false;
