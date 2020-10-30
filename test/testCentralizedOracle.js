@@ -3,7 +3,7 @@ const UsingTellor = artifacts.require("./UsingTellor.sol");
 const Sender = artifacts.require("./Sender.sol"); 
 const MockSender = artifacts.require("./MockSender.sol")
 const ReceiverStorage = artifacts.require("./ReceiverStorage.sol"); 
-const CentralizedOracle = artifacts.require("./CentralizedOracle.sol"); 
+const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
 const helpers = require("./helpers/test_helpers");
 
  contract("CentralizedOracle Contract fx testing", function(accounts) {
@@ -86,14 +86,17 @@ const helpers = require("./helpers/test_helpers");
     val = await centralizedOracle.retrieveData(1, _now)
     assert(val == 0," no value should be available")
     await mockTellor.submitValue(1,8000);
-    let res = await sender.getCurrentValueAndSend(1);
+    let res = await sender.getCurrentValueAndSend(1, {from: accounts[3]});
     let logdata = res.receipt.rawLogs[0].data
     logdata= logdata.substring(131)
     logdata = '0x' + logdata
     await receiverStorage.testOnStateRecieve(1,logdata);
     await helpers.advanceTime(3600)
+    let balance1 = await web3.eth.getBalance(accounts[3]);
     await centralizedOracle.settleChallenge(1,_now);
     val = await centralizedOracle.retrieveData(1, _now)
+    let balance2 = await web3.eth.getBalance(accounts[3]);
+    assert(balance2 * 1 == (balance1 * 1) + web3.utils.toWei("10") * 1, "Data provider should have received challengeFee" )
     assert(val == 8000)
    });
 
