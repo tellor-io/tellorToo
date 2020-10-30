@@ -4,7 +4,6 @@ const Sender = artifacts.require("./Sender.sol");
 const MockSender = artifacts.require("./MockSender.sol")
 const ReceiverStorage = artifacts.require("./ReceiverStorage.sol"); 
 const CentralizedOracle = artifacts.require("./CentralizedOracle.sol");
-const Attacker = artifacts.require("./Attacker.sol"); 
 const helpers = require("./helpers/test_helpers");
 
  contract("CentralizedOracle Contract fx testing", function(accounts) {

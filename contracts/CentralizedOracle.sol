@@ -92,7 +92,7 @@ contract CentralizedOracle  {
     require(now1 - _timestamp >= 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
     (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
-    challengeCount[_requestId]--;
+    challengeCount[_requestId] = challengeCount[_requestId].sub(1);
     if(challengeCount[_requestId] == 0){
       reqIdlocked[_requestId] = false;
     }
