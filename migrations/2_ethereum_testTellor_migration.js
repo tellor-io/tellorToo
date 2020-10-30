@@ -28,6 +28,6 @@ const MockTellor = artifacts.require('MockTellor.sol');
 
 module.exports = async function(deployer) {
     // deploy test tellor contract
-    await deployer.deploy(MockTellor,accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"));
+    await deployer.deploy(MockTellor,accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
 
 };

@@ -15,5 +15,5 @@ const ReceiverStorage = artifacts.require('ReceiverStorage.sol');
 
 module.exports = async function(deployer) {
     // deploy test tellor contract
-    await deployer.deploy(ReciverStorage);
+    await deployer.deploy(ReceiverStorage);
 };

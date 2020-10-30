@@ -4,8 +4,8 @@ pragma solidity 0.5.16;
 import "./libraries/SafeMath.sol";
 
 contract IReceiverStorage {
-  function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256, address);
-  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address);
+  function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256, address payable);
+  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address payable);
 }
 
 /**
@@ -90,7 +90,7 @@ contract CentralizedOracle  {
     require(isChallenged[_requestId][_timestamp], "Timestamp should be in dispute");
     uint now1 = now;
     require(now1 - _timestamp >= 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
-    (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
+    (uint256 tellorTimestamp, uint256 value, address payable dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
     challengeCount[_requestId] = challengeCount[_requestId].sub(1);
     if(challengeCount[_requestId] == 0){
@@ -98,7 +98,7 @@ contract CentralizedOracle  {
     }
     values[_requestId][_timestamp] = value;
     isChallenged[_requestId][_timestamp] = false;
-    dataProvider.call.value(challengeFee)("");
+    dataProvider.transfer(challengeFee);
     emit ChallengeSettled(_requestId,_timestamp);
   }
 
