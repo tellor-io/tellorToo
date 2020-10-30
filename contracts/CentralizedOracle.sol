@@ -97,8 +97,8 @@ contract CentralizedOracle  {
       reqIdlocked[_requestId] = false;
     }
     values[_requestId][_timestamp] = value;
-    dataProvider.call.value(challengeFee);
     isChallenged[_requestId][_timestamp] = false;
+    dataProvider.call.value(challengeFee)("");
     emit ChallengeSettled(_requestId,_timestamp);
   }
 
