@@ -9,7 +9,7 @@ const ReceiverStorage = artifacts.require('ReceiverStorage.sol');
 
 /**
 *These commands that need to be ran:
-*truffle migrate --network mumbai -f 1 --to 2 --skip-dry-run
+*truffle migrate --network maticTestnet -f 1 --to 2 --skip-dry-run
 */
 
 

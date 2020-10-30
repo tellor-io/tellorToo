@@ -116,12 +116,13 @@ module.exports = {
       gas: 10000000,
       gasPrice: 85000000000,
     },
-
+//https://rpc-mumbai.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6
+//https://rpc-mumbai.matic.today
     maticTestnet: {
     provider: () => new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`),
-      network_id: "*",       
+      network_id: "80001",       
       gas: 8000000,    
-      gasPrice: 3000000000,    
+      gasPrice: 3000000000,
       confirmations: 2,   
       timeoutBlocks: 200,  
       skipDryRun: true     
@@ -148,7 +149,7 @@ module.exports = {
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: true,
-          runs: 1000000
+          runs: 200
         },
       //  evmVersion: "byzantium"
       // }

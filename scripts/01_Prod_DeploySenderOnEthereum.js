@@ -18,8 +18,8 @@ maticStateSender = '';
 module.exports =async function(callback) {
     let sender
 
-    //constructor(address payable _tellorAddress, address _stateSender, address _receiver)
-    sender = await Sender.new(tellorMaster, maticStateSender, reciverStorage )
+    //On Ethereum-Mock tellor/tellorMaster and Sender
+    sender = await Sender.new(tellorMaster, maticStateSender, receiverStorage )
     console.log("sender: ", sender.address)
 
 }
