@@ -93,7 +93,7 @@ module.exports = {
         ),
       network_id: 3,
       gas: 10000000,
-      gasPrice: 80000000000,
+      gasPrice: 10000000000,
     },
   
     rinkeby: {
@@ -106,6 +106,16 @@ module.exports = {
       gas: 10000000,
       gasPrice: 80000000000,
     },
+    goerli: {
+      provider: () => {
+        new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", 
+          `https://goerli.infura.io/v3/${accessToken}`)
+      },
+      network_id: '5', // eslint-disable-line camelcase
+      gas: 10000000, //4465030,
+      gasPrice: 10000000000,
+    },
+
     mainnet: {
       provider: () =>
         new HDWalletProvider(
