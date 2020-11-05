@@ -15,10 +15,10 @@ const CentralizedOracle = artifacts.require('./CentralizedOracle')
 
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
+var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
 
 //var web3 = new Web3(new HDWalletProvider('12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef',"https://rinkeby.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
-var web3 = new Web3(new HDWalletProvider('12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef',"https://ropsten.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
+//var web3 = new Web3(new HDWalletProvider('12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef',"https://ropsten.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
 
 //var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/bc3e399903ae407fa477aa0854a00cdc"));
 
@@ -42,6 +42,7 @@ module.exports =async function(callback) {
   let receiverStorage
   let centralizedOracle
   let accts
+  let oracle
   let owner
   let oracle
   let maticReceiver
