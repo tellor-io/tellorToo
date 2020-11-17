@@ -57,13 +57,13 @@ module.exports =async function(callback) {
     /***STEP 1: Deploy ReceiverStorage on Matic and take the address to update maticReceiver var below**/
     //  //Matic  or Mumbai
     // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network mumbai
-    receiverStorage = await ReceiverStorage.new()
-    console.log("receiverStorage: ", receiverStorage.address)
-    
-    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+    // receiverStorage = await ReceiverStorage.new()
+    // console.log("receiverStorage: ", receiverStorage.address)
+
+    // centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
   
-    // receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
-    // centralizedOracle = await CentralizedOracle.new(receiverStorage, owner, oracle,web3.utils.toWei("10"))
+     receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
+     centralizedOracle = await CentralizedOracle.new(receiverStorage, owner, oracle,web3.utils.toWei("10"))
  
     console.log("centralizedOracle: ", centralizedOracle.address)
 
