@@ -23,25 +23,25 @@ var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
       
  	  centralizedOracle = await CentralizedOracle.at(centralizedOracleAddress)
  	  
- 	 await centralizedOracle.newDataset( 1,  3600)
- 	 console.log('new dat', 1)
- 	 await centralizedOracle.newDataset( 2,  3600)
- 	 console.log('new dat', 2)
- 	 await centralizedOracle.newDataset( 31,  3600)
- 	 console.log('new dat', 31)
- 	 await centralizedOracle.newDataset( 50,  3600)
- 	 console.log('new dat', 50)
+ 	 // await centralizedOracle.newDataset( 1,  3600)
+ 	 // console.log('new dat', 1)
+ 	 // await centralizedOracle.newDataset( 2,  3600)
+ 	 // console.log('new dat', 2)
+ 	 // await centralizedOracle.newDataset( 31,  3600)
+ 	 // console.log('new dat', 31)
+ 	 // await centralizedOracle.newDataset( 50,  3600)
+ 	 // console.log('new dat', 50)
 
 
 
- 	  // await centralizedOracle.submitData(1,1604599000, 411350000)
- 	  // console.log("eth gone")
- 	  // await centralizedOracle.submitData(2,1604598506, 15099550000)
- 	  // console.log("btc gone")
- 	  // await centralizedOracle.submitData(31,1604602312, 12981)
- 	  // console.log("matic gone")
- 	  // await centralizedOracle.submitData(50,1604602466, 21310000)
- 	  // console.log("trb gone")
+ 	  await centralizedOracle.submitData(1,1604599000, 411350000)
+ 	  console.log("eth gone")
+ 	  await centralizedOracle.submitData(2,1604598506, 15099550000)
+ 	  console.log("btc gone")
+ 	  await centralizedOracle.submitData(31,1604602312, 12981)
+ 	  console.log("matic gone")
+ 	  await centralizedOracle.submitData(50,1604602466, 21310000)
+ 	  console.log("trb gone")
 
       process.exit()
 

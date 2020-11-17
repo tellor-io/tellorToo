@@ -16,17 +16,15 @@ const CentralizedOracle = artifacts.require('./CentralizedOracle')
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
 var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
+//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));//bc3e399903ae407fa477aa0854a00cdc
 
-//var web3 = new Web3(new HDWalletProvider('12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef',"https://rinkeby.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
-//var web3 = new Web3(new HDWalletProvider('12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef',"https://ropsten.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
-
-//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/bc3e399903ae407fa477aa0854a00cdc"));
-
-//ropsten
-//var maticSender = '0x22E1f5aa1BA9e60527250FFeb35e30Aa2913727f'
+//4944b10f2cbd4e1d8c03e0e8ff2cd985
+//7f11ed6df93946658bf4c817620fbced
 
 //goerli
-//var maticSender = '0xEAa852323826C71cd7920C3b4c007184234c3945'
+var maticStateSender = '0xEAa852323826C71cd7920C3b4c007184234c3945'
+//StateSender": "0xEAa852323826C71cd7920C3b4c007184234c3945"
+
 
 // function sleep_s(secs) {
 //   secs = (+new Date) + secs * 1000;
@@ -44,7 +42,6 @@ module.exports =async function(callback) {
   let accts
   let oracle
   let owner
-  let oracle
   let maticReceiver
 
     accts = ['0xFAE65F91c2FbD2cecB35351b77B5d28c13F8AEF3', 
@@ -56,32 +53,39 @@ module.exports =async function(callback) {
     owner = '0xFAE65F91c2FbD2cecB35351b77B5d28c13F8AEF3'
     oracle = '0xFAE65F91c2FbD2cecB35351b77B5d28c13F8AEF3'
 
+
     /***STEP 1: Deploy ReceiverStorage on Matic and take the address to update maticReceiver var below**/
-    //  //Matic 
-    // receiverStorage = await ReceiverStorage.new()
-    // console.log("receiverStorage: ", receiverStorage.address)
+    //  //Matic  or Mumbai
+    // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network mumbai
+    receiverStorage = await ReceiverStorage.new()
+    console.log("receiverStorage: ", receiverStorage.address)
+    
+    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+  
+    // receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
+    // centralizedOracle = await CentralizedOracle.new(receiverStorage, owner, oracle,web3.utils.toWei("10"))
+ 
+    console.log("centralizedOracle: ", centralizedOracle.address)
+
+    usingTellor = await UsingTellor.new(centralizedOracle.address)
+    console.log("usingTellor: ", usingTellor.address)
 
     /*******UPDATE with deployment*****************************/
-    maticReceiver = '0x4ec6CF075D7216Fd25220D890E132386a78156B3'
+    receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
     /*******UPDATE maticReceiver var with deployment**************/
 
     /***STEP 2: Deploy MockTellor and sender contract on Ethereum or Ethereum testnet********/
     // //Ethereum-Goerli or ropsten (Matic's ropstend sender: 0x22E1f5aa1BA9e60527250FFeb35e30Aa2913727f)
-    mockTellor= await MockTellor.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
-    console.log("mockTellor: ", mockTellor.address)
+    // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network goerli
+
+    // mockTellor= await MockTellor.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
+    // console.log("mockTellor: ", mockTellor.address)
   	
-    sender = await Sender.new(mockTellor.address, maticSender, maticReceiver) 
-    console.log("sender: ", sender.address)
-    console.log("maticSener: ", maticSende)
-    console.log("maticReceiver: ", maticReceiver)
-
-    /***STEP 3: Deploy centralizedOracle and usingTellor on Matic Network**/
-    // //Matic
-    // centralizedOracle = await CentralizedOracle.new(maticReceiver, owner, oracle,web3.utils.toWei("10"))
-    // console.log("centralizedOracle: ", centralizedOracle.address)
-
-    // usingTellor = await UsingTellor.new(centralizedOracle.address)
-    // console.log("usingTellor: ", usingTellor.address)
+    // sender = await Sender.new(mockTellor.address, maticStateSender, receiverStorage) 
+    // //sender = await Sender.new(mockTellor, maticSender, receiverStorage) 
+    // console.log("Goerli sender: ", sender.address)
+    // console.log("Goerli maticStateSender: ", maticStateSender)
+    // console.log("mumbai receiverStorage: ", receiverStorage)
 
 
 }
