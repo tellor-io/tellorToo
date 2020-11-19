@@ -64,6 +64,7 @@ function settleChallenge(uint256 _requestId, uint256 _timestamp)
 
 ### Test Environment with Matic bridge
 Mumbai
+
 ReceiverStorage: [0xDc09952CB01c2da363F53fC8eC958895b6ab86F3](
 https://mumbai-explorer.matic.today/address/0xDc09952CB01c2da363F53fC8eC958895b6ab86F3/contracts)
 
@@ -74,6 +75,7 @@ UsingTellor: [0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F](
 https://mumbai-explorer.matic.today/address/0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F/contracts)
 
 Goerli
+
 MockTellor: [0x6DAdBde8Ad5F06334A7871e4da02698430c754FF](
 https://goerli.etherscan.io/address/0x6DAdBde8Ad5F06334A7871e4da02698430c754FF#code)
 
