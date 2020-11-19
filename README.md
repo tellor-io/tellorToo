@@ -49,6 +49,12 @@ contract YourContract is UsingTellor {
 
 Dispute invalid data and automatically fall back to Tellor's Ethereum's data. A dispute fee is needed to incentivize getting Ethereum's data and to disincentivize spaming the system with disputes. The dispute fee is paid out to the party that runs the Sender.retrieveDataAndSend or Sender.getCurrentValueAndSend functions that send over data to the side chain. 
 
+```solidity
+function challengeData(uint256 _requestId, uint256 _timestamp)
+
+function settleChallenge(uint256 _requestId, uint256 _timestamp)
+```
+
 ### Test Environment with Matic bridge
 Mumbai
 ReceiverStorage: [0xDc09952CB01c2da363F53fC8eC958895b6ab86F3](
