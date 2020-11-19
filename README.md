@@ -1,27 +1,71 @@
-# Optimistic Oracle
+# TellorToo
 
 This optimistic oracle allows for the use of a centralized oracle on an Ethereum sidechain with the option to dispute any datapoint with proof from Tellor's decentralized oracle on mainnet.
 
 
-User:
+## How to use TellorToo
 
 * Verify that that data is currently available on Tellor 
+
 Data currently available on Tellor's Ethereum network: 
 [https://docs.tellor.io/dev-documentation/reference-page/data-request-ids-1](https://docs.tellor.io/dev-documentation/reference-page/data-request-ids-1)
 
-* 
+If the data needed is not available submit a Tellor Improvement Plan[(TIP)](https://github.com/tellor-io/TIPs) to have your data supported. 
 
+* Allow your contract to read from TellorToo
+
+TellorToo is a centralized oracle and allows for faster data feeds. However, Tellor's data from Ethereum will supersede the centralized oracle's value if the user disputes the validity of the value submitted. 
+
+```solidity
+import "./UsingTellor.sol";
+
+contract YourContract is UsingTellor {
+    UsingTellor Tellor;
+
+    /*Constructor*/
+    /**
+    * @dev the constructor sets the storage address and owner
+    * @param _tellor is the TellorMaster address
+    */
+    constructor(address payable _UsingTellor) public {
+        tellor = UsingTellor(_UsingTellor);
+    }
+	
+    /**
+    * @dev Allows the user to get the latest value for the requestId specified
+    * @param _requestId is the requestId to look up the value for
+    * @return ifRetrieve bool true if it is able to retreive a value, the value, and the value's timestamp
+    * @return value the value retrieved
+    * @return _timestampRetrieved the value's timestamp
+    */
+    function getCurrentValue(uint256 _requestId) public view returns (bool ifRetrieve, uint256 value, uint256 _timestampRetrieved) {
+        return tellor.getCurrentValue(_requestId);
+    }
+
+}
+```
+
+* Dispute invalid data
+
+Dispute invalid data and automatically fall back to Tellor's Ethereum's data. A dispute fee is needed to incentivize getting Ethereum's data and to disincentivize spaming the system with disputes. The dispute fee is paid out to the party that runs the Sender.retrieveDataAndSend or Sender.getCurrentValueAndSend functions that send over data to the side chain. 
 
 ### Test Environment with Matic bridge
 Mumbai
-receiverStorage: 0xDc09952CB01c2da363F53fC8eC958895b6ab86F3
-centralizedOracle: 0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a
-usingTellor: 0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F
+ReceiverStorage: [0xDc09952CB01c2da363F53fC8eC958895b6ab86F3](
+https://mumbai-explorer.matic.today/address/0xDc09952CB01c2da363F53fC8eC958895b6ab86F3/contracts)
+
+CentralizedOracle: [0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a](
+https://mumbai-explorer.matic.today/address/0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a/contracts)
+
+UsingTellor: [0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F](
+https://mumbai-explorer.matic.today/address/0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F/contracts)
 
 Goerli
-mockTellor: 0x6DAdBde8Ad5F06334A7871e4da02698430c754FF
-sender: 0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921
+MockTellor: [0x6DAdBde8Ad5F06334A7871e4da02698430c754FF](
+https://goerli.etherscan.io/address/0x6DAdBde8Ad5F06334A7871e4da02698430c754FF#code)
 
+Sender: [0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921](
+https://goerli.etherscan.io/address/0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921#code)
 
 
 ### Test Environment with no bridge

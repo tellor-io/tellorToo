@@ -15,8 +15,9 @@ const CentralizedOracle = artifacts.require('./CentralizedOracle')
 
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
+//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
 //var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));//bc3e399903ae407fa477aa0854a00cdc
+var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://rinkeby.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));//bc3e399903ae407fa477aa0854a00cdc
 
 //4944b10f2cbd4e1d8c03e0e8ff2cd985
 //7f11ed6df93946658bf4c817620fbced
@@ -57,13 +58,13 @@ module.exports =async function(callback) {
     /***STEP 1: Deploy ReceiverStorage on Matic and take the address to update maticReceiver var below**/
     //  //Matic  or Mumbai
     // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network mumbai
-    // receiverStorage = await ReceiverStorage.new()
-    // console.log("receiverStorage: ", receiverStorage.address)
+    receiverStorage = await ReceiverStorage.new()
+    console.log("receiverStorage: ", receiverStorage.address)
 
-    // centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
   
-     receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
-     centralizedOracle = await CentralizedOracle.new(receiverStorage, owner, oracle,web3.utils.toWei("10"))
+     // receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
+     // centralizedOracle = await CentralizedOracle.new(receiverStorage, owner, oracle,web3.utils.toWei("10"))
  
     console.log("centralizedOracle: ", centralizedOracle.address)
 
@@ -71,7 +72,7 @@ module.exports =async function(callback) {
     console.log("usingTellor: ", usingTellor.address)
 
     /*******UPDATE with deployment*****************************/
-    receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
+    //receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
     /*******UPDATE maticReceiver var with deployment**************/
 
     /***STEP 2: Deploy MockTellor and sender contract on Ethereum or Ethereum testnet********/

@@ -4,10 +4,6 @@
 
 pragma solidity 0.5.16;
 
-// IStateReceiver represents interface to receive state
-// interface IStateReceiver {
-//   function onStateReceive(uint256 stateId, bytes calldata data) external;
-// }
 
 /**
 @title ReceiverStorage
@@ -15,7 +11,7 @@ This contract helps receive and decode Tellor's data from Ethereum on Matic's Ne
 */
 contract ReceiverStorage {
   event ValueRecieved(uint256 _stateId, uint _requestID, address _dataProvider, uint256 _value, uint256 _timestamp);
-  mapping(uint256 => mapping(uint256 => address)) public dataProvider;
+  mapping(uint256 => mapping(uint256 => address payable)) public dataProvider;
   mapping(uint256 => mapping(uint256 => uint256)) public values;
   mapping(uint256 => mapping(uint256 => bool)) public set;
   mapping(uint256 => uint256[]) public timestamps;
@@ -38,7 +34,7 @@ contract ReceiverStorage {
   @param data is the byte data with the specified output from an event on Ethereum
   */
   function internalOnStateRecieve(uint256 stateId, bytes memory data) internal{
-    (uint256 requestId, uint256 timestamp, uint256 value,address _dataProvider) = parse96BytesToThreeUint256(data);
+    (uint256 requestId, uint256 timestamp, uint256 value,address payable _dataProvider) = parse96BytesToThreeUint256(data);
     dataProvider[requestId][timestamp]= _dataProvider;
     values[requestId][timestamp] = value;   // Save to values datastore
     timestamps[requestId].push(timestamp);
@@ -61,7 +57,7 @@ contract ReceiverStorage {
   @param _requestId is Tellor's requestId to retrieve
   @return timestamp and value
   */
-  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address) {
+  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address payable) {
     uint len = timestamps[_requestId].length;
     uint timestamp = timestamps[_requestId][len-1];
     values[_requestId][timestamp];
@@ -72,11 +68,11 @@ contract ReceiverStorage {
   @dev This function allows the contract to decode the bytes data provided by Matic's validators
   @param data is the byte data with the specified output from an event on Ethereum
   */
-  function parse96BytesToThreeUint256(bytes memory data) internal pure returns(uint256, uint256, uint256,address) {
+  function parse96BytesToThreeUint256(bytes memory data) internal pure returns(uint256, uint256, uint256,address payable) {
     uint256 parsed1;
     uint256 parsed2;
     uint256 parsed3;
-    address parsed4;
+    address payable parsed4;
     assembly {
 	    parsed1 := mload(add(data, 32))
 	    parsed2 := mload(add(data, 64))
