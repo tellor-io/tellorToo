@@ -54,7 +54,7 @@ contract Sender is UsingTellor {
     @dev
     @param _tellorAddress is the tellor master address
     @param _stateSender is the Matic's state sender address --- they need to add the sender and receiver address
-    @param _receiver is the contract receiver address in Matic ??? 
+    @param _receiver is the contract receiver address in Matic
     */
     constructor(address payable _tellorAddress, address _stateSender, address _receiver) UsingTellor(_tellorAddress) public {
       stateSender = IStateSender(_stateSender);

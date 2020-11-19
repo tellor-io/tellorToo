@@ -1,6 +1,6 @@
 # TellorToo
 
-This optimistic oracle allows for the use of a centralized oracle on an Ethereum sidechain with the option to dispute any datapoint with proof from Tellor's decentralized oracle on mainnet.
+This optimistic oracle allows for the use of a centralized oracle on an Ethereum side chain with the option to challenge the validity any data point with proof from Tellor's decentralized oracle on mainnet.
 
 
 ## How to use TellorToo
@@ -14,7 +14,7 @@ If the data needed is not available submit a Tellor Improvement Plan[(TIP)](http
 
 * Allow your contract to read from TellorToo
 
-TellorToo is a centralized oracle and allows for faster data feeds. However, Tellor's data from Ethereum will supersede the centralized oracle's value if the user disputes the validity of the value submitted. 
+TellorToo is a centralized oracle and allows for faster data feeds. However, Tellor's data from Ethereum will supersede the centralized oracle's value if the user challenges the validity of the value submitted. 
 
 ```solidity
 import "./UsingTellor.sol";
@@ -45,15 +45,22 @@ contract YourContract is UsingTellor {
 }
 ```
 
-* Dispute invalid data
+* Challenge invalid data provided by the CentralizedOracle
 
-Dispute invalid data and automatically fall back to Tellor's Ethereum's data. A dispute fee is needed to incentivize getting Ethereum's data and to disincentivize spaming the system with disputes. The dispute fee is paid out to the party that runs the Sender.retrieveDataAndSend or Sender.getCurrentValueAndSend functions that send over data to the side chain. 
+Challenge invalid data and automatically fall back to Tellor's Ethereum's data. A fee to intiate a challenge is charged to incentivize getting Ethereum's data and to disincentivize spaming the network with irrelevant challenges. The challenge fee is paid out to the party that runs the Sender.retrieveDataAndSend or Sender.getCurrentValueAndSend functions on mainnet that send over data to settle the challenge on the side chain. 
 
 ```solidity
 function challengeData(uint256 _requestId, uint256 _timestamp)
+```
 
+* Settle the challenge on the side chain
+
+Once a challenge is initiated, there is a 1 hour wait time before it can be settled to Tellor's mainnet. The wait time allows for data to be requested on Tellor mainnet, in the event that it has not been mined in the allowed timeframe(data can be too old). To allow enough time for disputes on mainnet data, once the data is available on mainnet there is also a 1 hour wait time before the challenge can be settled.
+
+```solidity
 function settleChallenge(uint256 _requestId, uint256 _timestamp)
 ```
+
 
 ### Test Environment with Matic bridge
 Mumbai
@@ -74,10 +81,10 @@ Sender: [0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921](
 https://goerli.etherscan.io/address/0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921#code)
 
 
-### Test Environment with no bridge
-receiverStorage: 0x5Bb9d21C4d665bc82AE57D399d350Dc921687e01
-mockTellor: 0xd6a7B42C8548C4e5A1C6DDEDCd992A3Db98D57aa
-mockSender: 0xcEbec024c58C4Efa41DB118D8a8Cd30B7D02247b
-sender: 0xB750cc8647bEBA765B63259dB9Ac326EF0335dce
-centralizedOracle: 0xB99FFb1009504fbfcadC442930E2D652e3BB63c9
-usingTellor: 0x8b2313b41b759dC6Ec6BCb77749ED5DbF451476B
+[//]: # (### Test Environment with no bridge)
+[//]: # ( receiverStorage: 0x5Bb9d21C4d665bc82AE57D399d350Dc921687e01)
+[//]: # (mockTellor: 0xd6a7B42C8548C4e5A1C6DDEDCd992A3Db98D57aa)
+[//]: # (mockSender: 0xcEbec024c58C4Efa41DB118D8a8Cd30B7D02247b)
+[//]: # (sender: 0xB750cc8647bEBA765B63259dB9Ac326EF0335dce)
+[//]: # (centralizedOracle: 0xB99FFb1009504fbfcadC442930E2D652e3BB63c9)
+[//]: # (usingTellor: 0x8b2313b41b759dC6Ec6BCb77749ED5DbF451476B)
