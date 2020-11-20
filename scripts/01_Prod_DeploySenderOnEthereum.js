@@ -1,25 +1,59 @@
 /*****************Ethereum Sender Deployment*****************************************************/
 
-//                Deploy Sender on Ethereum                                            //
+//                Deploy Mainnet Ethereum and Matic                                       //
 
 /*****************************************************************************************/
-const Sender = artifacts.require('./Sender.sol')
+const MockTellor = artifacts.require('./MockTellor')
+const UsingTellor = artifacts.require('./UsingTellor')
+const MockSender = artifacts.require("./MockSender")
+const Sender = artifacts.require('./Sender')
+const ReceiverStorage = artifacts.require('./ReceiverStorage')
+const CentralizedOracle = artifacts.require('./CentralizedOracle')
 
 //from migrations
 //Ethereum contract address
-tellorMaster = '';
+tellorMaster = '0x0Ba45A8b5d5575935B8158a88C631E9F9C95a2e5';
 
 //Matic contract address
-receiverStorage = '';
-maticStateSender = ''; 
+//documentation may be outdated since their test net is goerli and not ropsten
+//verify matic's stateSender before deploying to mainnet Ethereum
+//https://docs.matic.network/docs/develop/advanced/transfer-data/
+maticStateSender = '0xfB631F5A239A5B651120335239CC19aEbCb185e6'; 
 
+//CentralizedOracle Owner and oracle
+owner = ''
+oracle = ''
 
 
 module.exports =async function(callback) {
     let sender
+    let receiverStorage
 
-    //On Ethereum-Mock tellor/tellorMaster and Sender
-    sender = await Sender.new(tellorMaster, maticStateSender, receiverStorage )
-    console.log("sender: ", sender.address)
+    /***STEP 1: Deploy ReceiverStorage on Matic and take the address to update maticReceiver var below**/
+    //  //Matic  or Mumbai
+    // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network mumbai
+    receiverStorage = await ReceiverStorage.new()
+    console.log("receiverStorage: ", receiverStorage.address)
+
+    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+    console.log("centralizedOracle: ", centralizedOracle.address)
+
+    usingTellor = await UsingTellor.new(centralizedOracle.address)
+    console.log("usingTellor: ", usingTellor.address)
+
+    /*******UPDATE with deployment*****************************/
+    //receiverStorage = '???'
+    /*******UPDATE maticReceiver var with deployment**************/
+
+    /***STEP 2: Deploy MockTellor and sender contract on Ethereum or Ethereum testnet********/
+    // //Ethereum-(Matic's  sender: ???)
+    // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network mainnet
+
+
+    // sender = await Sender.new(tellorMaster, maticStateSender, receiverStorage) 
+
+    // console.log("Mainnet sender: ", sender.address)
+    // console.log("Mainnet maticStateSender: ", maticStateSender)
+    // console.log("Matic receiverStorage: ", receiverStorage)
 
 }

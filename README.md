@@ -10,7 +10,7 @@ This optimistic oracle allows for the use of a centralized oracle on an Ethereum
 Data currently available on Tellor's Ethereum network: 
 [https://docs.tellor.io/dev-documentation/reference-page/data-request-ids-1](https://docs.tellor.io/dev-documentation/reference-page/data-request-ids-1)
 
-If the data needed is not available submit a Tellor Improvement Plan[(TIP)](https://github.com/tellor-io/TIPs) to have your data supported. 
+If the data needed is not available, please submit a Tellor Improvement Plan[(TIP)](https://github.com/tellor-io/TIPs) to have your data supported. 
 
 * Allow your contract to read from TellorToo
 

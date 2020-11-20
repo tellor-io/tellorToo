@@ -18,7 +18,8 @@ var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 
 var tellorAPIs = ['http://api.tellorscan.com/price/1', 
 				'http://api.tellorscan.com/price/2', 
-				'http://api.tellorscan.com/price/3']
+				'http://api.tellorscan.com/price/31',
+        'http://api.tellorscan.com/price/50']
 var num1 = tellorAPIs.length;
 var test = `http://api.tellorscan.com/price/1`
 //{"didGet":true,"value":"397380000","timestampRetrieved":"1604508720"}
