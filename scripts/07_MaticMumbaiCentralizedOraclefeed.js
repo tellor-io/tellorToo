@@ -35,12 +35,12 @@ async function fetchGasPrice() {
   }
 }
 
+
+
 //url and jsonData.${expression}
 //function that pulls data from API
-async function fetchPrice() {
-  var URL = `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd`;
-  var pointer = "ethereum";
-  var test = "usd";
+async function fetchPrice(URL, pointer, currency) {
+
   //var test = `jsonData.${pointer}`;
   try {
     const fetchResult = fetch(URL);
@@ -48,20 +48,22 @@ async function fetchPrice() {
     //console.log("response", response);
     const jsonData = await response.json();
     console.log(jsonData);
-    const priceNow = await jsonData[pointer][test];
+    const priceNow = await jsonData[pointer][currency];
     console.log(priceNow);
-    //const priceNow2 = await (priceNow/1000000);
-    //console.log(jsonData);
-    //console.log("gasPriceNow", gasPriceNow);
-    //console.log("gasPriceNow2", gasPriceNow2);
-    //return(gasPriceNow2);
-    return(priceNow);
+    const priceNow2 = await (priceNow*1000000);
+    return(priceNow2);
   } catch(e){
     throw Error(e);
   }
 }
 
-
+var dataAPIs = ['https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+           'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd',
+           'https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd',
+           'https://api.coingecko.com/api/v3/simple/price?ids=tellor&vs_currencies=usd'
+           ]
+var pointers = ["bitcoin", "ethereum","matic-network", "tellor" ]
+var currency = ["usd", "usd", "usd","usd"]
 
 module.exports =async function(callback) {
     try{
@@ -72,14 +74,34 @@ module.exports =async function(callback) {
         console.log("no gas price fetched");
     }
 
-
+    var k = dataAPIs.length;
+    for (i=1; i<k; i++){
     try{
-    var apiPrice = await fetchPrice();
-    console.log("apiPrice", apiPrice);
+        let dat
+        let point
+        let cur
+        let req
+        let apiPrice
+        let co
+        let timestamp
+
+        dat = dataAPIs[i]
+        point = pointers[i]
+        cur = currency[i]
+        //req = requestIds[i]
+        apiPrice = await fetchPrice(dat, point, cur)
+        console.log("apiPrice", apiPrice)
+        timestamp = (Date.now())/1000
+        console.log(timestamp)
+        //send update to centralized oracle
+        //co = await centralizedOracle.at(centralizedOracleAddress)
+        //await co.submitData(req, timestamp, apiPrice)
     } catch(error){
         console.error(error);
         console.log("no price fetched");
     }
+    }
+
     process.exit()
 
 }
