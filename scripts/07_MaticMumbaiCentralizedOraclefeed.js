@@ -64,6 +64,8 @@ var dataAPIs = ['https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_cu
            ]
 var pointers = ["bitcoin", "ethereum","matic-network", "tellor" ]
 var currency = ["usd", "usd", "usd","usd"]
+var requestIds = [1,2,31,50]
+
 
 module.exports =async function(callback) {
     try{
@@ -88,14 +90,39 @@ module.exports =async function(callback) {
         dat = dataAPIs[i]
         point = pointers[i]
         cur = currency[i]
-        //req = requestIds[i]
+        req = requestIds[i]
         apiPrice = await fetchPrice(dat, point, cur)
         console.log("apiPrice", apiPrice)
-        timestamp = (Date.now())/1000
+        timestamp = (Date.now())/1000 | 0
         console.log(timestamp)
         //send update to centralized oracle
-        //co = await centralizedOracle.at(centralizedOracleAddress)
+        //co = await CentralizedOracle.at(centralizedOracleAddress)
         //await co.submitData(req, timestamp, apiPrice)
+        rdat = await co.retrieveData(req, timestamp);
+        console.log(rdat);
+        if (dat == rdat) {
+        //save entry on txt file/json
+
+        let saving  = "requestId" + i;
+            saving = {Id: i,
+                    time: timestamp,
+                    value: apiPrice,
+                    desc: point & "/" & cur,
+                    api: dat
+                }
+            let jsonName = JSON.stringify(saving);
+            console.log("InitialReqID info", jsonName);
+            let filename = "./scripts/reqID" + i + ".json";
+            fs.writeFile(filename, jsonName, function(err) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+
+
+
+
+        }
     } catch(error){
         console.error(error);
         console.log("no price fetched");
