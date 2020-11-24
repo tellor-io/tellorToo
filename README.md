@@ -4,9 +4,9 @@ Tellor's Optimistic Oracle, TellorToo, allows for the use of a centralized oracl
 
 TellorToo allows side chain users the ability to get pricing data faster from a centralized oracle but with the security of a decentralized oracle. The user can place trust on a centralized party since if the user disagrees with the price provided they can challenge the validity of it and use Tellor's data from Ethereum as their official value. The security of TellorToo is derived from mainnet Tellor's security.
 
-## TellorToo is up on testnet
+### TellorToo is up on testnet
 
-### Test Environment with Matic bridge
+
 Mumbai
 
 ReceiverStorage: [0xDc09952CB01c2da363F53fC8eC958895b6ab86F3](
@@ -27,7 +27,7 @@ Sender: [0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921](
 https://goerli.etherscan.io/address/0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921#code)
 
 
-## How to use TellorToo
+### How to use TellorToo
 
 * Verify that that data is currently available on Tellor 
 
