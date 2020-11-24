@@ -103,7 +103,7 @@ module.exports =async function(callback) {
         rdat = await co.retrieveData(req, timestamp);
         console.log(rdat*1)
         rdat1 = rdat*1
-        if (dat == rdat1) {
+        if (apiPrice == rdat1) {
             console.log("Data is on chain, save a copy")
         //save entry on txt file/json
         let saving  = "requestId" + i;
@@ -115,17 +115,14 @@ module.exports =async function(callback) {
                 }
             let jsonName = JSON.stringify(saving);
             console.log("InitialReqID info", jsonName);
-            let filename = "./savedData/reqID" + i + ".json";
+            let filename = "./savedData/MaticMumbaireqID" + i + ".json";
             fs.writeFile(filename, jsonName, function(err) {
                 if (err) {
                     console.log(err);
                 }
             });
-
-
-
-
         }
+
     } catch(error){
         console.error(error);
         console.log("no price fetched");

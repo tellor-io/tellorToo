@@ -99,21 +99,20 @@ module.exports =async function(callback) {
         req = requestIds[i]
         apiPrice = await fetchPrice(dat, point, cur)
         console.log("apiPrice", apiPrice)
-        timestamp = (Date.now())/1000 | 0
-        console.log(timestamp)
+
         //send update to centralized oracle
         mo = await MockTellor.at(mockTellorAddress)
         await mo.submitValue(req, apiPrice)
-        rdat = await mo.retrieveData(req, timestamp);
-        console.log(rdat*1)
-        rdat1 = rdat*1
 
         send = await Sender.at(senderAddress)
+        (ifRetrieve, value, timestamp) = await send.getCurrentValueAndSend(req);
+        console.log(value*1)
+        rdat1 = value*1
+
+
         await send.getCurrentValueAndSend(req)
 
-
-
-        if (dat == rdat1) {
+        if (apiPrice == rdat1) {
             console.log("Data is on chain, save a copy")
             //save entry on txt file/json
             let saving  = "requestId" + i;
@@ -125,7 +124,7 @@ module.exports =async function(callback) {
                 }
             let jsonName = JSON.stringify(saving);
             console.log("InitialReqID info", jsonName);
-            let filename = "./savedData/reqID" + i + ".json";
+            let filename = "./savedData/EthGoerlireqID" + i + ".json";
             fs.writeFile(filename, jsonName, function(err) {
                 if (err) {
                     console.log(err);
