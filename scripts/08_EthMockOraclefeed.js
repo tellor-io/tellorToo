@@ -80,7 +80,7 @@ module.exports =async function(callback) {
     }
 
     var k = dataAPIs.length;
-    for (i=1; i<k; i++){
+    for (i=0; i<k; i++){
       try{
         let dat
         let point
@@ -104,11 +104,14 @@ module.exports =async function(callback) {
         //send update to centralized oracle
         mo = await MockTellor.at(mockTellorAddress)
         await mo.submitValue(req, apiPrice)
-        value = await mo.getCurrentValue(req)
-        console.log(value*1)
-        value1 = value*1
+
 
         send = await Sender.at(senderAddress)
+        value = await send.getCurrentValue(req)
+        console.log(value[1]*1)
+        value1 = value[1]*1
+
+
         await send.getCurrentValueAndSend(req);
         console.log("value sent")
 
