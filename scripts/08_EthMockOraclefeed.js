@@ -92,6 +92,7 @@ module.exports =async function(callback) {
         let rdat
         let rdat1
         let send
+        let res
 
         dat = dataAPIs[i]
         point = pointers[i]
@@ -103,16 +104,15 @@ module.exports =async function(callback) {
         //send update to centralized oracle
         mo = await MockTellor.at(mockTellorAddress)
         await mo.submitValue(req, apiPrice)
+        value = await mo.getCurrentValue(req)
+        console.log(value*1)
+        value1 = value*1
 
         send = await Sender.at(senderAddress)
-        (ifRetrieve, value, timestamp) = await send.getCurrentValueAndSend(req);
-        console.log(value*1)
-        rdat1 = value*1
+        await send.getCurrentValueAndSend(req);
+        console.log("value sent")
 
-
-        await send.getCurrentValueAndSend(req)
-
-        if (apiPrice == rdat1) {
+        if (apiPrice == value1) {
             console.log("Data is on chain, save a copy")
             //save entry on txt file/json
             let saving  = "requestId" + i;
