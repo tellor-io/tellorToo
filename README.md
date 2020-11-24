@@ -1,6 +1,30 @@
 # TellorToo
 
-This optimistic oracle allows for the use of a centralized oracle on an Ethereum side chain with the option to challenge the validity any data point with proof from Tellor's decentralized oracle on mainnet.
+Tellor's Optimistic Oracle, TellorToo, allows for the use of a centralized oracle on an Ethereum side chain with the option to challenge the validity of any data point with proof from Tellor's decentralized oracle on mainnet.
+
+TellorToo allows side chain users the ability to get pricing data faster from a centralized oracle but with the security of a decentralized oracle. The user can place trust on a centralized party since if the user disagrees with the price provided they can challenge the validity of it and use Tellor's data from Ethereum as their official value. The security of TellorToo is derived from mainnet Tellor's security.
+
+## TellorToo is up on testnet
+
+### Test Environment with Matic bridge
+Mumbai
+
+ReceiverStorage: [0xDc09952CB01c2da363F53fC8eC958895b6ab86F3](
+https://mumbai-explorer.matic.today/address/0xDc09952CB01c2da363F53fC8eC958895b6ab86F3/contracts)
+
+CentralizedOracle: [0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a](
+https://mumbai-explorer.matic.today/address/0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a/contracts)
+
+UsingTellor: [0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F](
+https://mumbai-explorer.matic.today/address/0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F/contracts)
+
+Goerli
+
+MockTellor: [0x6DAdBde8Ad5F06334A7871e4da02698430c754FF](
+https://goerli.etherscan.io/address/0x6DAdBde8Ad5F06334A7871e4da02698430c754FF#code)
+
+Sender: [0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921](
+https://goerli.etherscan.io/address/0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921#code)
 
 
 ## How to use TellorToo
@@ -14,7 +38,7 @@ If the data needed is not available, please submit a Tellor Improvement Plan[(TI
 
 * Allow your contract to read from TellorToo
 
-TellorToo is a centralized oracle and allows for faster data feeds. However, Tellor's data from Ethereum will supersede the centralized oracle's value if the user challenges the validity of the value submitted. 
+TellorToo is a centralized oracle and allows for faster data feeds. However, Tellor's data from Ethereum will supersede the centralized oracle's value if the user challenges the validity of the value provided. 
 
 ```solidity
 import "./UsingTellor.sol";
@@ -61,26 +85,6 @@ Once a challenge is initiated, there is a 1 hour wait time before it can be sett
 function settleChallenge(uint256 _requestId, uint256 _timestamp)
 ```
 
-
-### Test Environment with Matic bridge
-Mumbai
-
-ReceiverStorage: [0xDc09952CB01c2da363F53fC8eC958895b6ab86F3](
-https://mumbai-explorer.matic.today/address/0xDc09952CB01c2da363F53fC8eC958895b6ab86F3/contracts)
-
-CentralizedOracle: [0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a](
-https://mumbai-explorer.matic.today/address/0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a/contracts)
-
-UsingTellor: [0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F](
-https://mumbai-explorer.matic.today/address/0x3cF36e31FF602E4368E0E656Cf40378bF8e0A38F/contracts)
-
-Goerli
-
-MockTellor: [0x6DAdBde8Ad5F06334A7871e4da02698430c754FF](
-https://goerli.etherscan.io/address/0x6DAdBde8Ad5F06334A7871e4da02698430c754FF#code)
-
-Sender: [0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921](
-https://goerli.etherscan.io/address/0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921#code)
 
 
 [//]: # (### Test Environment with no bridge)
