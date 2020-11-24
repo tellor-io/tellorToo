@@ -1,18 +1,21 @@
+
 /**************************Matic Auto data feed********************************************/
 
 //                Centralized oracle price feed                                   //
 
 /******************************************************************************************/
-const CentralizedOracle = artifacts.require('./CentralizedOracle')
+const MockTellor = artifacts.require('./MockTellor')
+const Sender = artifacts.require('./Sender')
 
 var fs = require('fs');
 const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
-//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
+//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
+var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
 
-var centralizedOracleAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
+var senderAddress = '0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921'
+var mockTellorAddress = '0x6DAdBde8Ad5F06334A7871e4da02698430c754FF'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
@@ -78,16 +81,17 @@ module.exports =async function(callback) {
 
     var k = dataAPIs.length;
     for (i=1; i<k; i++){
-    try{
+      try{
         let dat
         let point
         let cur
         let req
         let apiPrice
-        let co
+        let mo
         let timestamp
         let rdat
         let rdat1
+        let send
 
         dat = dataAPIs[i]
         point = pointers[i]
@@ -98,15 +102,21 @@ module.exports =async function(callback) {
         timestamp = (Date.now())/1000 | 0
         console.log(timestamp)
         //send update to centralized oracle
-        co = await CentralizedOracle.at(centralizedOracleAddress)
-        await co.submitData(req, timestamp, apiPrice)
-        rdat = await co.retrieveData(req, timestamp);
+        mo = await MockTellor.at(mockTellorAddress)
+        await mo.submitValue(req, apiPrice)
+        rdat = await mo.retrieveData(req, timestamp);
         console.log(rdat*1)
         rdat1 = rdat*1
+
+        send = await Sender.at(senderAddress)
+        await send.getCurrentValueAndSend(req)
+
+
+
         if (dat == rdat1) {
             console.log("Data is on chain, save a copy")
-        //save entry on txt file/json
-        let saving  = "requestId" + i;
+            //save entry on txt file/json
+            let saving  = "requestId" + i;
             saving = {Id: i,
                     time: timestamp,
                     value: apiPrice,
@@ -121,15 +131,11 @@ module.exports =async function(callback) {
                     console.log(err);
                 }
             });
-
-
-
-
         }
-    } catch(error){
+      } catch(error){
         console.error(error);
         console.log("no price fetched");
-    }
+      }
     }
 
     process.exit()

@@ -89,7 +89,7 @@ contract CentralizedOracle  {
   function settleChallenge(uint256 _requestId, uint256 _timestamp) payable external {
     require(isChallenged[_requestId][_timestamp], "Timestamp should be in dispute");
     uint now1 = now;
-    require(now1 - _timestamp >= 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
+    require(now1 - _timestamp >= 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is available an undisputed");   
     (uint256 tellorTimestamp, uint256 value, address payable dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
     challengeCount[_requestId] = challengeCount[_requestId].sub(1);
