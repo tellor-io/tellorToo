@@ -145,6 +145,17 @@ module.exports = {
     },  
   },
 
+    matic: {
+    provider: () => new HDWalletProvider("", `https://rpc-mainnet.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6`),
+      network_id: "137",       
+      gas: 4000000,    
+      gasPrice: 5000000000,
+      confirmations: 2,   
+      timeoutBlocks: 200,  
+      skipDryRun: true     
+    },  
+  },
+
 
 
   // Set default mocha options here, use special reporters etc.
