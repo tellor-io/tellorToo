@@ -143,7 +143,7 @@ module.exports = {
       timeoutBlocks: 200,  
       skipDryRun: true     
     },  
-  },
+  
 
     matic: {
     provider: () => new HDWalletProvider("", `https://rpc-mainnet.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6`),

@@ -1,10 +1,10 @@
-pragma solidity 0.5.16;
+pragma solidity ^0.5.11;
 
 import "tellorcore/contracts/TellorMaster.sol";
 
 /**
 * @title UserContract 
-* This is a TEST contract. It creates for easy integration to the Tellor System
+* It creates for easy integration to the Tellor System
 * by allowing smart contracts to read data off Tellor
 * **************only for testing**************
 */
@@ -144,7 +144,7 @@ contract UsingTellor{
 The sender address from Ethereum and receiver address deployed in Matic must
 be registered in Matic's sender contact on Ethereum for 
 */
-interface IStateSender {
+contract IStateSender {
   function syncState(address receiver, bytes calldata data) external;
   function register(address sender, address receiver) public;
 }

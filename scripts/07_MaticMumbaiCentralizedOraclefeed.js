@@ -3,6 +3,8 @@
 //                Centralized oracle price feed                                   //
 
 /******************************************************************************************/
+//truffle exec scripts/07_MaticMumbaiCentralizedOraclefeed.js --network mumbai
+
 const CentralizedOracle = artifacts.require('./CentralizedOracle')
 
 var fs = require('fs');

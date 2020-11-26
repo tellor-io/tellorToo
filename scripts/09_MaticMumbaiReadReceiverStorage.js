@@ -3,6 +3,8 @@
 //                Receiver contract price feed getter                                   //
 
 /******************************************************************************************/
+//truffle exec scripts/09_MaticMumbaiReadReceiverStorage.js --network mumbai
+
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
 
 var fs = require('fs');

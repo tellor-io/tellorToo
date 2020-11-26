@@ -4,6 +4,8 @@
 //                Centralized oracle price feed                                   //
 
 /******************************************************************************************/
+//truffle exec scripts/08_EthMockOracleFeed.js --network goerli
+
 const MockTellor = artifacts.require('./MockTellor')
 const Sender = artifacts.require('./Sender')
 
