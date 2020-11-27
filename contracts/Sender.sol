@@ -3,50 +3,16 @@
 pragma solidity ^0.5.11;
 
 import "./UsingTellor.sol";
+import "./IStateSender.sol";
+import "./MockSender.sol";
 
-/** 
-The sender address from Ethereum and receiver address deployed in Matic must
-be registered in Matic's sender contact on Ethereum for 
-*/
-contract IStateSenderTest {
-  function syncState(address receiver, bytes calldata data) external;
-  function register(address sender, address receiver) public;
-}
-
-/*This is a Mock Sender contract to mimic the Matic validator functions*/
-contract MockSender {
-  event StateSynced(bytes data);
-
-  struct Data{
-    address receiver;
-    bytes data;
-  }
-  mapping (uint => Data) idToData;
-  uint256 public ids;
-  
-
-  function  syncState(address _receiver, bytes calldata _data) external returns(uint){
-    emit StateSynced(_data);
-    ids++;
-    idToData[ids] = Data({
-      receiver:_receiver,
-      data:_data
-    });
-    return ids;
-  }
-
-  function getDataFromId(uint _id) external view returns(address, bytes memory){
-    return (idToData[_id].receiver,idToData[_id].data);
-  }
-
-}
 
 /**
 @title Sender
 This contract helps send Tellor's data on Ethereum to Matic's Network
 */
 contract Sender is UsingTellor {
-    IStateSenderTest public stateSender;
+    IStateSender public stateSender;
     event DataSent(uint _requestId, uint _timestamp, uint _value, address _sender);    
     address public receiver;
 
@@ -57,7 +23,7 @@ contract Sender is UsingTellor {
     @param _receiver is the contract receiver address in Matic
     */
     constructor(address payable _tellorAddress, address _stateSender, address _receiver) UsingTellor(_tellorAddress) public {
-      stateSender = IStateSenderTest(_stateSender);
+      stateSender = IStateSender(_stateSender);
       receiver = _receiver;
     }
 
