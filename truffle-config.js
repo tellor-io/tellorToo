@@ -135,7 +135,9 @@ module.exports = {
 //https://rpc-mumbai.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6
 //https://rpc-mumbai.matic.today
     mumbai: {
-    provider: () => new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`),
+    provider: () => new HDWalletProvider(
+      "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+       `https://rpc-mumbai.matic.today`),
       network_id: "80001",       
       gas: 8000000,    
       gasPrice: 3000000000,
@@ -146,7 +148,9 @@ module.exports = {
   
 
     matic: {
-    provider: () => new HDWalletProvider("", `https://rpc-mainnet.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6`),
+    provider: () => new HDWalletProvider(
+      "", 
+      `https://rpc-mainnet.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6`),
       network_id: "137",       
       gas: 4000000,    
       gasPrice: 5000000000,

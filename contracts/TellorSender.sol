@@ -3,7 +3,7 @@ pragma solidity ^0.5.11;
 import "tellorcore/contracts/TellorMaster.sol";
 
 /**
-* @title UserContract 
+* @title TellorSender 
 * It creates for easy integration to the Tellor System
 * by allowing smart contracts to read data off Tellor
 * **************only for testing**************

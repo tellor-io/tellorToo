@@ -2,7 +2,7 @@
 
 pragma solidity ^0.5.11;
 
-import "./UsingTellorTest.sol";
+import "./UsingTellor.sol";
 
 /** 
 The sender address from Ethereum and receiver address deployed in Matic must
@@ -45,7 +45,7 @@ contract MockSender {
 @title Sender
 This contract helps send Tellor's data on Ethereum to Matic's Network
 */
-contract Sender is UsingTellorTest {
+contract Sender is UsingTellor {
     IStateSenderTest public stateSender;
     event DataSent(uint _requestId, uint _timestamp, uint _value, address _sender);    
     address public receiver;
@@ -56,7 +56,7 @@ contract Sender is UsingTellorTest {
     @param _stateSender is the Matic's state sender address --- they need to add the sender and receiver address
     @param _receiver is the contract receiver address in Matic
     */
-    constructor(address payable _tellorAddress, address _stateSender, address _receiver) UsingTellorTest(_tellorAddress) public {
+    constructor(address payable _tellorAddress, address _stateSender, address _receiver) UsingTellor(_tellorAddress) public {
       stateSender = IStateSenderTest(_stateSender);
       receiver = _receiver;
     }

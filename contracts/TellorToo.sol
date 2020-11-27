@@ -1,4 +1,4 @@
-// CentralizedOracle2.sol
+// TellorToo.sol
 
 pragma solidity 0.5.16;
 import "./libraries/SafeMath.sol";
@@ -11,7 +11,7 @@ contract IReceiverStorage {
 /**
 Ensure the request Id exists in Tellor before using it as a dispute mechanism
 */
-contract CentralizedOracle  {
+contract TellorToo  {
   using SafeMath for uint256;
 
   IReceiverStorage public receiverStorage;
@@ -153,7 +153,7 @@ contract CentralizedOracle  {
   @param _timestamp is the timestamp to look up
   @return true if it is being challenged 
   */
-  function isInDispute(uint256 _requestId, uint256 _timestamp) public view returns(bool){
+  function isUnderChallenge(uint256 _requestId, uint256 _timestamp) public view returns(bool){
       return isChallenged[_requestId][_timestamp];
   }
 

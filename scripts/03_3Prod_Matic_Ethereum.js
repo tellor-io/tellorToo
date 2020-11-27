@@ -4,12 +4,11 @@
 
 /*****************************************************************************************/
 
-const MockTellor = artifacts.require('./MockTellor')
-const UsingTellor = artifacts.require('./UsingTellor')
-const MockSender = artifacts.require("./MockSender")
-const Sender = artifacts.require('./Sender')
+
+const UsingTellor = artifacts.require('./UsingTellorToo')
+const Sender = artifacts.require('./TellorSender')
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
-const CentralizedOracle = artifacts.require('./CentralizedOracle')
+const CentralizedOracle = artifacts.require('./TellorToo')
 
 //link to contracts for matic
 //https://github.com/maticnetwork/static/blob/master/network/mainnet/v1/index.json
@@ -32,16 +31,13 @@ var web3 = new Web3(new HDWalletProvider("", `https://rpc-mainnet.maticvigil.com
 
 module.exports =async function(callback) {
 
-  let mockTellor
-  //let mockSender
-  let usingTellor
-  let sender
+
+  let usingTellorToo
+  let tellorsender
   let receiverStorage
-  let centralizedOracle
-  let accts
+  let tellorToo
   let oracle
   let owner
-  let maticReceiver
 
     owner = '0xe7AfE96d50e44837134ce6DDA16d524ba5033d90'
     oracle = '0xe7AfE96d50e44837134ce6DDA16d524ba5033d90'
@@ -53,21 +49,21 @@ module.exports =async function(callback) {
     receiverStorage = await ReceiverStorage.new()
     console.log("receiverStorage: ", receiverStorage.address)
 
-    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("1000"))
-    console.log("centralizedOracle: ", centralizedOracle.address)
+    tellorToo = await TellorToo.new(receiverStorage.address, owner, oracle,web3.utils.toWei("1000"))
+    console.log("TellorToo: ", tellorToo.address)
 
-    usingTellor = await UsingTellor.new(centralizedOracle.address)
-    console.log("usingTellor: ", usingTellor.address)
+    usingTellorToo = await UsingTellorToo.new(tellorToo.address)
+    console.log("usingTellorToo: ", usingTellor.address)
 
     /*******UPDATE with deployment*****************************/
     //receiverStorage = ''
     /*******UPDATE maticReceiver var with deployment**************/
 
-    /***STEP 2: Deploy MockTellor and sender contract on Ethereum or Ethereum testnet********/
+    /***STEP 2: Deploy sender contract on Ethereum or Ethereum testnet********/
     // //Ethereum
     // //truffle exec scripts/03_3Prod_Matic_Ethereum.js --network mainnet
 
-    // sender = await Sender.new(tellorMasterAddress, maticStateSender, receiverStorage) 
+    // tellorSender = await TellorSender.new(tellorMasterAddress, maticStateSender, receiverStorage) 
 
     // console.log("Mainnet sender: ", sender.address)
     // console.log("Mainnet maticStateSender: ", maticStateSender)

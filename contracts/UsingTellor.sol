@@ -8,7 +8,7 @@ import "./MockTellor.sol";
 * by allowing smart contracts to read data off Tellor
 * **************only for testing**************
 */
-contract UsingTellorTest{
+contract UsingTellor{
     MockTellor tellor;
     /*Constructor*/
     /**
