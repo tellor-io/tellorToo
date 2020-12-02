@@ -6,9 +6,9 @@
 
 
 const UsingTellor = artifacts.require('./UsingTellorToo')
-const Sender = artifacts.require('./TellorSender')
+const TellorSender = artifacts.require('./TellorSender')
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
-const CentralizedOracle = artifacts.require('./TellorToo')
+const TellorToo = artifacts.require('./TellorToo')
 
 //link to contracts for matic
 //https://github.com/maticnetwork/static/blob/master/network/mainnet/v1/index.json
@@ -52,8 +52,8 @@ module.exports =async function(callback) {
     tellorToo = await TellorToo.new(receiverStorage.address, owner, oracle,web3.utils.toWei("1000"))
     console.log("TellorToo: ", tellorToo.address)
 
-    usingTellorToo = await UsingTellorToo.new(tellorToo.address)
-    console.log("usingTellorToo: ", usingTellor.address)
+    //usingTellorToo = await UsingTellorToo.new(tellorToo.address)
+    //console.log("usingTellorToo: ", usingTellor.address)
 
     /*******UPDATE with deployment*****************************/
     //receiverStorage = ''

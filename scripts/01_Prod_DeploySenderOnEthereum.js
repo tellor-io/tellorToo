@@ -3,12 +3,12 @@
 //                Deploy Mainnet Ethereum and Matic                                       //
 
 /*****************************************************************************************/
-const MockTellor = artifacts.require('./MockTellor')
+const TellorPlayground = artifacts.require('./TellorPlayground')
 const UsingTellor = artifacts.require('./UsingTellor')
 const MockSender = artifacts.require("./MockSender")
-const Sender = artifacts.require('./Sender')
+const TellorSender = artifacts.require('./TellorSender')
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
-const CentralizedOracle = artifacts.require('./CentralizedOracle')
+const TellorToo = artifacts.require('./TellorToo')
 
 //from migrations
 //Ethereum contract address
@@ -26,7 +26,7 @@ oracle = ''
 
 
 module.exports =async function(callback) {
-    let sender
+    let tellorSender
     let receiverStorage
 
     /***STEP 1: Deploy ReceiverStorage on Matic and take the address to update maticReceiver var below**/
@@ -35,24 +35,24 @@ module.exports =async function(callback) {
     receiverStorage = await ReceiverStorage.new()
     console.log("receiverStorage: ", receiverStorage.address)
 
-    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
-    console.log("centralizedOracle: ", centralizedOracle.address)
+    tellorToo = await TellorToo.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+    console.log("TellorToo: ", tellorToo.address)
 
-    usingTellor = await UsingTellor.new(centralizedOracle.address)
-    console.log("usingTellor: ", usingTellor.address)
+    //usingTellor = await UsingTellor.new(centralizedOracle.address)
+    //console.log("usingTellor: ", usingTellor.address)
 
     /*******UPDATE with deployment*****************************/
     //receiverStorage = '???'
     /*******UPDATE maticReceiver var with deployment**************/
 
-    /***STEP 2: Deploy MockTellor and sender contract on Ethereum or Ethereum testnet********/
+    /***STEP 2: Deploy sender contract on Ethereum or Ethereum testnet********/
     // //Ethereum-(Matic's  sender: ???)
     // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network mainnet
 
 
-    // sender = await Sender.new(tellorMaster, maticStateSender, receiverStorage) 
+    // tellorSender = await Sender.new(tellorMaster, maticStateSender, receiverStorage) 
 
-    // console.log("Mainnet sender: ", sender.address)
+    // console.log("Mainnet sender: ", tellorSender.address)
     // console.log("Mainnet maticStateSender: ", maticStateSender)
     // console.log("Matic receiverStorage: ", receiverStorage)
 

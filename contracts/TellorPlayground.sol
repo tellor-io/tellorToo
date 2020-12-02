@@ -1,9 +1,10 @@
 pragma solidity 0.5.16;
 
+//import "usingtellor/contracts/TellorPlayground.sol";
 import "./libraries/SafeMath.sol";
 
 
-contract MockTellor {
+contract TellorPlayground {
 
     using SafeMath for uint256;
     event Transfer(address indexed _from, address indexed _to, uint256 _value);//ERC20 Transfer Event

@@ -4,12 +4,11 @@
 
 /*****************************************************************************************/
 
-const MockTellor = artifacts.require('./MockTellor')
+const TellorPlayground = artifacts.require('./TellorPlayground')
 const UsingTellor = artifacts.require('./UsingTellor')
-const MockSender = artifacts.require("./MockSender")
-const Sender = artifacts.require('./Sender')
+const TellorSender = artifacts.require('./TellorSender')
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
-const CentralizedOracle = artifacts.require('./CentralizedOracle')
+const TellorToo = artifacts.require('./TellorToo')
 
 
 
@@ -31,11 +30,10 @@ var maticStateSender = '0xEAa852323826C71cd7920C3b4c007184234c3945'
 module.exports =async function(callback) {
 
   let mockTellor
-  //let mockSender
   let usingTellor
-  let sender
+  let tellorSender
   let receiverStorage
-  let centralizedOracle
+  let tellorToo
   let accts
   let oracle
   let owner
@@ -57,15 +55,15 @@ module.exports =async function(callback) {
     receiverStorage = await ReceiverStorage.new()
     console.log("receiverStorage: ", receiverStorage.address)
 
-    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+    tellorToo = await TellorToo.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
   
      // receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
      // centralizedOracle = await CentralizedOracle.new(receiverStorage, owner, oracle,web3.utils.toWei("10"))
  
-    console.log("centralizedOracle: ", centralizedOracle.address)
+    console.log("TellorToo: ", tellorToo.address)
 
-    usingTellor = await UsingTellor.new(centralizedOracle.address)
-    console.log("usingTellor: ", usingTellor.address)
+    //usingTellor = await UsingTellor.new(centralizedOracle.address)
+    //console.log("usingTellor: ", usingTellor.address)
 
     /*******UPDATE with deployment*****************************/
     //receiverStorage = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
@@ -75,12 +73,11 @@ module.exports =async function(callback) {
     // //Ethereum-Goerli or ropsten (Matic's ropstend sender: 0x22E1f5aa1BA9e60527250FFeb35e30Aa2913727f)
     // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network goerli
 
-    // mockTellor= await MockTellor.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
+    // mockTellor= await TellorPlayground.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
     // console.log("mockTellor: ", mockTellor.address)
   	
-    // sender = await Sender.new(mockTellor.address, maticStateSender, receiverStorage) 
-    // //sender = await Sender.new(mockTellor, maticSender, receiverStorage) 
-    // console.log("Goerli sender: ", sender.address)
+    // tellorSender = await TellorSender.new(mockTellor.address, maticStateSender, receiverStorage) 
+    // console.log("Goerli TellorSender: ", TellorSender.address)
     // console.log("Goerli maticStateSender: ", maticStateSender)
     // console.log("mumbai receiverStorage: ", receiverStorage)
 

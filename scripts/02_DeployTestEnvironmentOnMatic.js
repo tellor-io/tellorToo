@@ -4,12 +4,11 @@
 
 /******************************************************************************************/
 
-const MockTellor = artifacts.require('./MockTellor')
+const TellorPlayground = artifacts.require('./TellorPlayground')
 const UsingTellor = artifacts.require('./UsingTellor')
-const MockSender = artifacts.require("./MockSender")
-const Sender = artifacts.require('./Sender')
+const TellorSender = artifacts.require('./TellorSender')
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
-const CentralizedOracle = artifacts.require('./CentralizedOracle')
+const TellorToo = artifacts.require('./TellorToo')
 
 
 
@@ -26,9 +25,8 @@ var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2
 module.exports =async function(callback) {
 
   let mockTellor
-  //let mockSender
   let usingTellor
-  let sender
+  let tellorSender
   let receiverStorage
   let centralizedOracle
   let accts
@@ -47,20 +45,20 @@ module.exports =async function(callback) {
     receiverStorage = await ReceiverStorage.new()
     console.log("receiverStorage: ", receiverStorage.address)
 
-    mockTellor= await MockTellor.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
+    mockTellor= await TellorPlayground.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
     console.log("mockTellor: ", mockTellor.address)
 
     mockSender = await MockSender.new();
     console.log("mockSender: ", mockSender.address)
   	
-    sender = await Sender.new(mockTellor.address, mockSender.address, receiverStorage.address) 
-    console.log("sender: ", sender.address)
+    tellorSender = await TellorSender.new(mockTellor.address, mockSender.address, receiverStorage.address) 
+    console.log("tellorsender: ", tellorSender.address)
 
-    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
-    console.log("centralizedOracle: ", centralizedOracle.address)
+    tellorToo = await TellorToo.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+    console.log("centralizedOracle: ", TellorToo.address)
 
-    usingTellor = await UsingTellor.new(centralizedOracle.address)
-    console.log("usingTellor: ", usingTellor.address)
+    //usingTellor = await UsingTellor.new(centralizedOracle.address)
+    //console.log("usingTellor: ", usingTellor.address)
 
 
 }
