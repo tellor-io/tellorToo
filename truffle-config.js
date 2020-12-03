@@ -23,7 +23,8 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 //const mnemonic = process.env.ETH_MNEMONIC;
 const accessToken = process.env.WEB3_INFURA_PROJECT_ID;
-const mnemonic =
+const pk = process.env.PRIVATE_KEY;
+const pk_mainnet = process.env.PRIVATE_KEY_MAINNET;
   "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish";
 
 // ganache-cli -m "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish" -l 10000000 --allowUnlimitedContractSize
@@ -88,7 +89,7 @@ module.exports = {
     ropsten: {
       provider: () =>
         new HDWalletProvider(
-          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+          pk,
           `https://ropsten.infura.io/v3/${accessToken}`
         ),
       network_id: 3,
@@ -99,7 +100,7 @@ module.exports = {
     rinkeby: {
       provider: () =>
         new HDWalletProvider(
-          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+          pk,
           `https://rinkeby.infura.io/v3/${accessToken}`
         ),
       network_id: 4,
@@ -110,7 +111,7 @@ module.exports = {
     goerli: {
       provider: () =>
         new HDWalletProvider(
-          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+          pk,
           `https://goerli.infura.io/v3/${accessToken}`
         ),
       network_id: 5,
@@ -125,7 +126,7 @@ module.exports = {
     mainnet: {
       provider: () =>
         new HDWalletProvider(
-          "",
+          pk_mainnet,
           `https://mainnet.infura.io/v3/${accessToken}`
         ),
       network_id: 1,
@@ -136,7 +137,7 @@ module.exports = {
 //https://rpc-mumbai.matic.today
     mumbai: {
     provider: () => new HDWalletProvider(
-      "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+      pk,
        `https://rpc-mumbai.matic.today`),
       network_id: "80001",       
       gas: 8000000,    
@@ -149,7 +150,7 @@ module.exports = {
 
     matic: {
     provider: () => new HDWalletProvider(
-      "", 
+      pk_mainnet, 
       `https://rpc-mainnet.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6`),
       network_id: "137",       
       gas: 4000000,    

@@ -4,15 +4,15 @@
 
 /******************************************************************************************/
 //truffle exec scripts/08_MaticMumbaiReadReceiverStorage.js --network mumbai
-
+ require("dotenv").config();
+ const pk = process.env.PRIVATE_KEY;
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
 
 var fs = require('fs');
 const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
-//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
+var web3 = new Web3(new HDWalletProvider(pk, `https://rpc-mumbai.matic.today`));
 
 var receiverStorageAddress = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');

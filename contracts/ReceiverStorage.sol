@@ -82,7 +82,7 @@ contract ReceiverStorage {
   /**
   @dev This is a test function and will be commented out for production
   */
-  function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
-    internalOnStateRecieve(stateId, data);
-  }
+  // function testOnStateRecieve(uint256 stateId, bytes calldata data) external{
+  //   internalOnStateRecieve(stateId, data);
+  // }
 }
