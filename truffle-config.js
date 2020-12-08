@@ -22,10 +22,12 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 //const mnemonic = process.env.ETH_MNEMONIC;
-const accessToken = process.env.WEB3_INFURA_PROJECT_ID;
-const pk = process.env.PRIVATE_KEY;
-const pk_mainnet = process.env.PRIVATE_KEY_MAINNET;
-  "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish";
+const accessToken = process.env.WEB3_INFURA_PROJECT_ID
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const pk = process.env.PRIVATE_KEY
+const pk_mainnet = process.env.ETH_PK
+const matic_pk = process.env.MATIC_PK
+  "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish"
 
 // ganache-cli -m "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish" -l 10000000 --allowUnlimitedContractSize
 
@@ -138,7 +140,7 @@ module.exports = {
     mumbai: {
     provider: () => new HDWalletProvider(
       pk,
-       `https://rpc-mumbai.matic.today`),
+       `https://rpc-mumbai.maticvigil.com/v1/${matic_accessToken}`),
       network_id: "80001",       
       gas: 8000000,    
       gasPrice: 3000000000,
@@ -150,8 +152,8 @@ module.exports = {
 
     matic: {
     provider: () => new HDWalletProvider(
-      pk_mainnet, 
-      `https://rpc-mainnet.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6`),
+      matic_pk, 
+      `https://rpc-mainnet.maticvigil.com/v1/${matic_accessToken}`),
       network_id: "137",       
       gas: 4000000,    
       gasPrice: 5000000000,
@@ -181,7 +183,7 @@ module.exports = {
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: true,
-          runs: 200
+          runs: 5000000
         },
       //  evmVersion: "byzantium"
       // }
