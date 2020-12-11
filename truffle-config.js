@@ -24,9 +24,10 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 //const mnemonic = process.env.ETH_MNEMONIC;
 const accessToken = process.env.WEB3_INFURA_PROJECT_ID
 const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
-const pk = process.env.PRIVATE_KEY
+const pk_rinkeby = process.env.RINKEBY_ETH_PK
 const pk_mainnet = process.env.ETH_PK
 const matic_pk = process.env.MATIC_PK
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
   "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish"
 
 // ganache-cli -m "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish" -l 10000000 --allowUnlimitedContractSize
@@ -91,7 +92,7 @@ module.exports = {
     ropsten: {
       provider: () =>
         new HDWalletProvider(
-          pk,
+          pk_rinkeby,
           `https://ropsten.infura.io/v3/${accessToken}`
         ),
       network_id: 3,
@@ -102,7 +103,7 @@ module.exports = {
     rinkeby: {
       provider: () =>
         new HDWalletProvider(
-          pk,
+          pk_rinkeby,
           `https://rinkeby.infura.io/v3/${accessToken}`
         ),
       network_id: 4,
@@ -113,7 +114,7 @@ module.exports = {
     goerli: {
       provider: () =>
         new HDWalletProvider(
-          pk,
+          pk_rinkeby,
           `https://goerli.infura.io/v3/${accessToken}`
         ),
       network_id: 5,
@@ -139,7 +140,7 @@ module.exports = {
 //https://rpc-mumbai.matic.today
     mumbai: {
     provider: () => new HDWalletProvider(
-      pk,
+      mumbai_pk,
        `https://rpc-mumbai.maticvigil.com/v1/${matic_accessToken}`),
       network_id: "80001",       
       gas: 8000000,    

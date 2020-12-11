@@ -1,21 +1,25 @@
 /**************************Matic Auto data feed********************************************/
 
-//                Centralized oracle price feed                                   //
+//                Receiver contract price getter                                   //
 
 /******************************************************************************************/
-//truffle exec scripts/06_MaticMumbaiCentralizedOraclefeed.js --network mumbai
- require("dotenv").config();
- const pk = process.env.PRIVATE_KEY;
+//truffle exec scripts/08_MaticMumbaiReadReceiverStorage.js --network mumbai
+require("dotenv").config();
 
-const TellorToo = artifacts.require('./TellorToo')
+const ReceiverStorage = artifacts.require('./ReceiverStorage')
 
 var fs = require('fs');
 const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider(pk, `https://rpc-mumbai.matic.today`));
 
-var centralizedOracleAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
+
+var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+
+
+var receiverStorageAddress = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
@@ -87,7 +91,7 @@ module.exports =async function(callback) {
         let cur
         let req
         let apiPrice
-        let co
+        let rs
         let timestamp
         let rdat
         let rdat1
@@ -98,33 +102,31 @@ module.exports =async function(callback) {
         req = requestIds[i]
         apiPrice = await fetchPrice(dat, point, cur)
         console.log("apiPrice", apiPrice)
-        timestamp = (Date.now())/1000 | 0
-        console.log(timestamp)
+
         //send update to centralized oracle
-        co = await TellorToo.at(centralizedOracleAddress)
-        await co.submitData(req, timestamp, apiPrice)
-        rdat = await co.retrieveData(req, timestamp);
-        console.log(rdat*1)
-        rdat1 = rdat*1
-        if (apiPrice == rdat1) {
-            console.log("Data is on chain, save a copy")
-        //save entry on txt file/json
-        let saving  = "requestId" + i;
-            saving = {Id: i,
-                    time: timestamp,
-                    value: apiPrice,
-                    desc: point & "/" & cur,
-                    api: dat
-                }
-            let jsonName = JSON.stringify(saving);
-            console.log("InitialReqID info", jsonName);
-            let filename = "./savedData/MaticMumbaireqID" + i + ".json";
-            fs.writeFile(filename, jsonName, function(err) {
-                if (err) {
-                    console.log(err);
-                }
-            });
-        }
+        rs = await ReceiverStorage.at(receiverStorageAddress)
+        rdat = await rs.retrieveLatestValue(req);
+        console.log("data on receiver storage: ",  rdat[1]*1)
+        //rdat1 = rdat*1
+        // if (apiPrice == rdat1) {
+        //     console.log("Data is on chain, save a copy")
+        // //save entry on txt file/json
+        // let saving  = "requestId" + i;
+        //     saving = {Id: i,
+        //             time: timestamp,
+        //             value: apiPrice,
+        //             desc: point & "/" & cur,
+        //             api: dat
+        //         }
+        //     let jsonName = JSON.stringify(saving);
+        //     console.log("InitialReqID info", jsonName);
+        //     let filename = "./savedData/MaticMumbaireqID" + i + ".json";
+        //     fs.writeFile(filename, jsonName, function(err) {
+        //         if (err) {
+        //             console.log(err);
+        //         }
+        //     });
+        // }
 
     } catch(error){
         console.error(error);

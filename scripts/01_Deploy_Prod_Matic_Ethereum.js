@@ -20,9 +20,14 @@ var HDWalletProvider = require("@truffle/hdwallet-provider");
 var maticStateSender = '0x28e4F3a7f651294B9564800b2D01f35189A5bFbE'
 var tellorMasterAddress = '0x0Ba45A8b5d5575935B8158a88C631E9F9C95a2e5'
 
-var web3 = new Web3(new HDWalletProvider("", `https://rpc-mainnet.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6`));
-//var web3 = new Web3(new HDWalletProvider("", "https://mainnet.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
+//const mnemonic = process.env.ETH_MNEMONIC;
+const accessToken = process.env.WEB3_INFURA_PROJECT_ID
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const pk_mainnet = process.env.ETH_PK
+const matic_pk = process.env.MATIC_PK
 
+//var web3 = new Web3(new HDWalletProvider(matic_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+var web3 = new Web3(new HDWalletProvider(pk, "https://goerli.infura.io/v3/" + accessToken));
 
 // function sleep_s(secs) {
 //   secs = (+new Date) + secs * 1000;
@@ -65,7 +70,7 @@ module.exports =async function(callback) {
 
     // tellorSender = await TellorSender.new(tellorMasterAddress, maticStateSender, receiverStorage) 
 
-    // console.log("Mainnet sender: ", sender.address)
+    // console.log("Mainnet sender: ", tellorsender.address)
     // console.log("Mainnet maticStateSender: ", maticStateSender)
     // console.log("Matic receiverStorage: ", receiverStorage)
 

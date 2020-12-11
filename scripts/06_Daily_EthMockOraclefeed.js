@@ -1,20 +1,30 @@
-/**************************Matic Auto data feed********************************************/
 
-//                Receiver contract price getter                                   //
+/**************************Goerli TellorPlayground Auto data feed********************************************/
+
+//                Goerli MockTellor Feed and send data to Matic                                  //
 
 /******************************************************************************************/
-//truffle exec scripts/08_MaticMumbaiReadReceiverStorage.js --network mumbai
- require("dotenv").config();
- const pk = process.env.PRIVATE_KEY;
-const ReceiverStorage = artifacts.require('./ReceiverStorage')
+//truffle exec scripts/07_EthMockOracleFeed.js --network goerli
+require("dotenv").config();
+
+const TellorPlayground = artifacts.require('./TellorPlayground')
+const TellorSender = artifacts.require('./TellorSender')
 
 var fs = require('fs');
 const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider(pk, `https://rpc-mumbai.matic.today`));
 
-var receiverStorageAddress = '0xDc09952CB01c2da363F53fC8eC958895b6ab86F3'
+const accessToken = process.env.WEB3_INFURA_PROJECT_ID
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const pk_test = process.env.RINKEBY_ETH_PK
+
+var web3 = new Web3(new HDWalletProvider(pk_test, "https://goerli.infura.io/v3/" + accessToken));
+
+
+var tellorSenderAddress = '0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921'
+//tellorPlayground = 0x20374E579832859f180536A69093A126Db1c8aE9
+var mockTellorAddress = '0x6DAdBde8Ad5F06334A7871e4da02698430c754FF'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
@@ -80,16 +90,18 @@ module.exports =async function(callback) {
 
     var k = dataAPIs.length;
     for (i=0; i<k; i++){
-    try{
+      try{
         let dat
         let point
         let cur
         let req
         let apiPrice
-        let rs
+        let mo
         let timestamp
         let rdat
         let rdat1
+        let send
+        let res
 
         dat = dataAPIs[i]
         point = pointers[i]
@@ -99,34 +111,42 @@ module.exports =async function(callback) {
         console.log("apiPrice", apiPrice)
 
         //send update to centralized oracle
-        rs = await ReceiverStorage.at(receiverStorageAddress)
-        rdat = await rs.retrieveLatestValue(req);
-        console.log("data on receiver storage: ",  rdat[1]*1)
-        //rdat1 = rdat*1
-        // if (apiPrice == rdat1) {
-        //     console.log("Data is on chain, save a copy")
-        // //save entry on txt file/json
-        // let saving  = "requestId" + i;
-        //     saving = {Id: i,
-        //             time: timestamp,
-        //             value: apiPrice,
-        //             desc: point & "/" & cur,
-        //             api: dat
-        //         }
-        //     let jsonName = JSON.stringify(saving);
-        //     console.log("InitialReqID info", jsonName);
-        //     let filename = "./savedData/MaticMumbaireqID" + i + ".json";
-        //     fs.writeFile(filename, jsonName, function(err) {
-        //         if (err) {
-        //             console.log(err);
-        //         }
-        //     });
-        // }
+        mo = await TellorPlayground.at(mockTellorAddress)
+        await mo.submitValue(req, apiPrice)
 
-    } catch(error){
+
+        send = await TellorSender.at(tellorSenderAddress)
+        value = await send.getCurrentValue(req)
+        console.log(value[1]*1)
+        value1 = value[1]*1
+
+
+        await send.getCurrentValueAndSend(req);
+        console.log("value sent")
+
+        if (apiPrice == value1) {
+            console.log("Data is on chain, save a copy")
+            //save entry on txt file/json
+            let saving  = "requestId" + i;
+            saving = {Id: i,
+                    time: timestamp,
+                    value: apiPrice,
+                    desc: point & "/" & cur,
+                    api: dat
+                }
+            let jsonName = JSON.stringify(saving);
+            console.log("InitialReqID info", jsonName);
+            let filename = "./savedData/EthGoerlireqID" + i + ".json";
+            fs.writeFile(filename, jsonName, function(err) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
+      } catch(error){
         console.error(error);
         console.log("no price fetched");
-    }
+      }
     }
 
     process.exit()

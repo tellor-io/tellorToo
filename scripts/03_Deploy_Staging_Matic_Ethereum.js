@@ -18,17 +18,16 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 //const mnemonic = process.env.ETH_MNEMONIC;
 const accessToken = process.env.WEB3_INFURA_PROJECT_ID
 const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
-const pk = process.env.PRIVATE_KEY
-const pk_mainnet = process.env.ETH_PK
-const matic_pk = process.env.MATIC_PK
+const pk_test = process.env.RINKEBY_ETH_PK
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
 
 
-//var web3 = new Web3(new HDWalletProvider(matic_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
-var web3 = new Web3(new HDWalletProvider(pk, "https://goerli.infura.io/v3/" + accessToken));
+//var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+var web3 = new Web3(new HDWalletProvider(pk_test, "https://goerli.infura.io/v3/" + accessToken));
 
 //goerli
 var maticStateSender = '0xEAa852323826C71cd7920C3b4c007184234c3945'
-//StateSender": "0xEAa852323826C71cd7920C3b4c007184234c3945"
+
 
 
 // function sleep_s(secs) {
@@ -76,14 +75,16 @@ module.exports =async function(callback) {
     // //Ethereum-Goerli or ropsten (Matic's ropstend sender: 0x22E1f5aa1BA9e60527250FFeb35e30Aa2913727f)
     // //truffle exec scripts/03_Staging_Matic_Ethereum.js --network goerli
 
-   //  mockTellor= await TellorPlayground.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
-   //  console.log("mockTellor: ", mockTellor.address)
+    mockTellor= await TellorPlayground.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
+    console.log("mockTellor: ", mockTellor.address)
+    console.log("Goerli maticStateSender1: ", maticStateSender)
+    console.log("mumbai receiverStorage1: ", receiverStorage)
   	
-   //  tellorSender = await TellorSender.new(mockTellor.address, maticStateSender, receiverStorage) 
-    let mockTelloraddress = "0x7d75b5e148fD47B8BacA8eBAf2EC97554c31Eb04"
+    tellorSender = await TellorSender.new(mockTellor.address, maticStateSender, receiverStorage) 
+/*    let mockTelloraddress = "0x7d75b5e148fD47B8BacA8eBAf2EC97554c31Eb04"
    tellorSender = await TellorSender.new(mockTelloraddress, maticStateSender, receiverStorage) 
-   
-    console.log("Goerli TellorSender: ", TellorSender.address)
+   */
+    console.log("Goerli TellorSender: ", tellorSender.address)
     console.log("Goerli maticStateSender: ", maticStateSender)
     console.log("mumbai receiverStorage: ", receiverStorage)
 

@@ -11,7 +11,11 @@ const TellorToo = artifacts.require('./TellorToo')
 
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
+
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
+
+var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
 
 var TellorTooAddress = '0xB99FFb1009504fbfcadC442930E2D652e3BB63c9'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');

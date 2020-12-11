@@ -1,25 +1,25 @@
+/**************************Matic Auto data feed********************************************/
 
-/**************************Goerli TellorPlayground Auto data feed********************************************/
-
-//                Goerli MockTellor Feed and send data to Matic                                  //
+//                Centralized oracle price feed                                   //
 
 /******************************************************************************************/
-//truffle exec scripts/07_EthMockOracleFeed.js --network goerli
- require("dotenv").config();
- const pk = process.env.PRIVATE_KEY;
+//truffle exec scripts/06_MaticMumbaiCentralizedOraclefeed.js --network mumbai
+require("dotenv").config();
 
-const TellorPlayground = artifacts.require('./TellorPlayground')
-const TellorSender = artifacts.require('./TellorSender')
+const TellorToo = artifacts.require('./TellorToo')
 
 var fs = require('fs');
 const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider(pk, "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
 
-var tellorSenderAddress = '0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921'
-//tellorPlayground = 0x20374E579832859f180536A69093A126Db1c8aE9
-var mockTellorAddress = '0x6DAdBde8Ad5F06334A7871e4da02698430c754FF'
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
+
+var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+
+
+var centralizedOracleAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
@@ -85,18 +85,16 @@ module.exports =async function(callback) {
 
     var k = dataAPIs.length;
     for (i=0; i<k; i++){
-      try{
+    try{
         let dat
         let point
         let cur
         let req
         let apiPrice
-        let mo
+        let co
         let timestamp
         let rdat
         let rdat1
-        let send
-        let res
 
         dat = dataAPIs[i]
         point = pointers[i]
@@ -104,25 +102,18 @@ module.exports =async function(callback) {
         req = requestIds[i]
         apiPrice = await fetchPrice(dat, point, cur)
         console.log("apiPrice", apiPrice)
-
+        timestamp = (Date.now())/1000 | 0
+        console.log(timestamp)
         //send update to centralized oracle
-        mo = await TellorPlayground.at(mockTellorAddress)
-        await mo.submitValue(req, apiPrice)
-
-
-        send = await TellorSender.at(tellorSenderAddress)
-        value = await send.getCurrentValue(req)
-        console.log(value[1]*1)
-        value1 = value[1]*1
-
-
-        await send.getCurrentValueAndSend(req);
-        console.log("value sent")
-
-        if (apiPrice == value1) {
+        co = await TellorToo.at(centralizedOracleAddress)
+        await co.submitData(req, timestamp, apiPrice)
+        rdat = await co.retrieveData(req, timestamp);
+        console.log(rdat*1)
+        rdat1 = rdat*1
+        if (apiPrice == rdat1) {
             console.log("Data is on chain, save a copy")
-            //save entry on txt file/json
-            let saving  = "requestId" + i;
+        //save entry on txt file/json
+        let saving  = "requestId" + i;
             saving = {Id: i,
                     time: timestamp,
                     value: apiPrice,
@@ -131,17 +122,18 @@ module.exports =async function(callback) {
                 }
             let jsonName = JSON.stringify(saving);
             console.log("InitialReqID info", jsonName);
-            let filename = "./savedData/EthGoerlireqID" + i + ".json";
+            let filename = "./savedData/MaticMumbaireqID" + i + ".json";
             fs.writeFile(filename, jsonName, function(err) {
                 if (err) {
                     console.log(err);
                 }
             });
         }
-      } catch(error){
+
+    } catch(error){
         console.error(error);
         console.log("no price fetched");
-      }
+    }
     }
 
     process.exit()
