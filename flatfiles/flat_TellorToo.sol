@@ -1,3 +1,8 @@
+//constructor mainnet matic statement:
+//0000000000000000000000002dF7C3f267c0433Ee143bAa7D40c4eccD411E10d00000000000000000000000098df64e8ebaa2ccbe171e3058b3b2cbd49abbd6a00000000000000000000000098df64e8ebaa2ccbe171e3058b3b2cbd49abbd6a00000000000000000000000000000000000000000000003635c9adc5dea00000
+
+
+
 // File: contracts\libraries\SafeMath.sol
 
 pragma solidity 0.5.16;
@@ -54,21 +59,27 @@ library SafeMath {
     }
 }
 
-// File: contracts\CentralizedOracle.sol
+// File: contracts\IReceiverStorage.sol
 
-// CentralizedOracle2.sol
-
-pragma solidity 0.5.16;
+pragma solidity 0.5.16;
 
 contract IReceiverStorage {
-  function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256, address);
-  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address);
+  function retrieveData(uint256 _requestId, uint256 _timestamp) public view returns(bool, uint256, address payable);
+  function retrieveLatestValue(uint256 _requestId) public view returns(uint256, uint256, address payable);
 }
+
+// File: contracts\TellorToo.sol
+
+// TellorToo.sol
+
+pragma solidity 0.5.16;
+
+
 
 /**
 Ensure the request Id exists in Tellor before using it as a dispute mechanism
 */
-contract CentralizedOracle  {
+contract TellorToo  {
   using SafeMath for uint256;
 
   IReceiverStorage public receiverStorage;
@@ -146,16 +157,16 @@ contract CentralizedOracle  {
   function settleChallenge(uint256 _requestId, uint256 _timestamp) payable external {
     require(isChallenged[_requestId][_timestamp], "Timestamp should be in dispute");
     uint now1 = now;
-    require(now1 - _timestamp >= 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is avialable an undisputed");   
-    (uint256 tellorTimestamp, uint256 value, address dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
+    require(now1 - _timestamp >= 1 hours, "1 hour has to pass before settling challenge to ensure Tellor data is available an undisputed");   
+    (uint256 tellorTimestamp, uint256 value, address payable dataProvider) = receiverStorage.retrieveLatestValue(_requestId);
     require(now1 - tellorTimestamp >= 3600, "No data has been received from Tellor in 1 hour"); 
-    challengeCount[_requestId]--;
+    challengeCount[_requestId] = challengeCount[_requestId].sub(1);
     if(challengeCount[_requestId] == 0){
       reqIdlocked[_requestId] = false;
     }
     values[_requestId][_timestamp] = value;
-    dataProvider.call.value(challengeFee);
     isChallenged[_requestId][_timestamp] = false;
+    dataProvider.transfer(challengeFee);
     emit ChallengeSettled(_requestId,_timestamp);
   }
 
@@ -210,7 +221,7 @@ contract CentralizedOracle  {
   @param _timestamp is the timestamp to look up
   @return true if it is being challenged 
   */
-  function isInDispute(uint256 _requestId, uint256 _timestamp) public view returns(bool){
+  function isUnderChallenge(uint256 _requestId, uint256 _timestamp) public view returns(bool){
       return isChallenged[_requestId][_timestamp];
   }
 
@@ -227,4 +238,89 @@ contract CentralizedOracle  {
       }
       return values[_requestId][_timestamp];
   }
+
+
+    /**
+    * @dev Allows the user to get the latest value for the requestId specified
+    * @param _requestId is the requestId to look up the value for
+    * @return ifRetrieve bool true if it is able to retreive a value, the value, and the value's timestamp
+    * @return value the value retrieved
+    * @return _timestampRetrieved the value's timestamp
+    */
+    function getCurrentValue(uint256 _requestId) public view returns (bool ifRetrieve, uint256 value, uint256 _timestampRetrieved) {
+        uint256 _count = getNewValueCountbyRequestId(_requestId);
+        uint _time = getTimestampbyRequestIDandIndex(_requestId, _count - 1);
+        uint _value = retrieveData(_requestId, _time);
+        if(_value > 0) return (true, _value, _time);
+        return (false, 0 , _time);
+    }
+    
+    function getIndexForDataBefore(uint _requestId, uint256 _timestamp) public view returns (bool found, uint256 index){
+        uint256 _count = getNewValueCountbyRequestId(_requestId);   
+        if (_count > 0) {
+            uint middle;
+            uint start = 0;
+            uint end = _count - 1;
+            uint _time;
+
+            //Checking Boundaries to short-circuit the algorithm
+            _time = getTimestampbyRequestIDandIndex(_requestId, start);
+            if(_time >= _timestamp) return (false, 0);
+            _time = getTimestampbyRequestIDandIndex(_requestId, end);
+            if(_time < _timestamp) return (true, end);
+
+            //Since the value is within our boundaries, do a binary search
+            while(true) {
+                middle = (end - start) / 2 + 1 + start;
+                _time = getTimestampbyRequestIDandIndex(_requestId, middle);
+                if(_time < _timestamp){
+                    //get imeadiate next value
+                    uint _nextTime = getTimestampbyRequestIDandIndex(_requestId, middle + 1);
+                    if(_nextTime >= _timestamp){
+                        //_time is correct
+                        return (true, middle);
+                    } else  {
+                        //look from middle + 1(next value) to end
+                        start = middle + 1;
+                    }
+                } else {
+                    uint _prevTime = getTimestampbyRequestIDandIndex(_requestId, middle - 1);
+                    if(_prevTime < _timestamp){
+                        // _prevtime is correct
+                        return(true, middle - 1);
+                    } else {
+                        //look from start to middle -1(prev value)
+                        end = middle -1;
+                    }
+                }
+                //We couldn't found a value 
+                //if(middle - 1 == start || middle == _count) return (false, 0);
+            }
+        }
+        return (false, 0);
+    }
+
+
+    /**
+    * @dev Allows the user to get the first value for the requestId before the specified timestamp
+    * @param _requestId is the requestId to look up the value for
+    * @param _timestamp before which to search for first verified value
+    * @return _ifRetrieve bool true if it is able to retreive a value, the value, and the value's timestamp
+    * @return _value the value retrieved
+    * @return _timestampRetrieved the value's timestamp
+    */
+    function getDataBefore(uint256 _requestId, uint256 _timestamp)
+        public
+        returns (bool _ifRetrieve, uint256 _value, uint256 _timestampRetrieved)
+    {
+        
+        (bool _found, uint _index) = getIndexForDataBefore(_requestId,_timestamp);
+        if(!_found) return (false, 0, 0);
+        uint256 _time = getTimestampbyRequestIDandIndex(_requestId, _index);
+        _value = retrieveData(_requestId, _time);
+        //If value is diputed it'll return zero
+        if (_value > 0) return (true, _value, _time);
+        return (false, 0, 0);
+    }
+
 }

@@ -1,4 +1,4 @@
 //truffle-flattener contracts/ReceiverStorage.sol > flatfiles/flat_ReceiverStorage.sol
-//truffle-flattener contracts/Sender.sol > flatfiles/flat_TellorSender.sol
-//truffle-flattener contracts/MockTellor.sol > flatfiles/flat_TellorPlayground.sol
-//truffle-flattener contracts/CentralizedOracle.sol > flatfiles/flat_TellorToo.sol
+//truffle-flattener contracts/TellorSender.sol > flatfiles/flat_TellorSender.sol
+//truffle-flattener contracts/TellorPlayground.sol > flatfiles/flat_TellorPlayground.sol
+//truffle-flattener contracts/TellorToo.sol > flatfiles/flat_TellorToo.sol
