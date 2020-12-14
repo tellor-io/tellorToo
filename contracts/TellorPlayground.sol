@@ -23,6 +23,7 @@ contract TellorPlayground {
         }
     }
 
+
     function mint(address _holder, uint256 _value) public {
         balances[_holder] = balances[_holder].add(_value);
         totalSupply = totalSupply.add(_value);
@@ -68,7 +69,7 @@ contract TellorPlayground {
         return timestamps[_requestId][index];
     }
 
-    function getTime() public view returns(uint256){
-        return now;
-    }
+    // function getTime() public view returns(uint256){
+    //     return now;
+    // }
 }

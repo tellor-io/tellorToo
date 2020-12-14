@@ -18,7 +18,7 @@
  *
  */
 
- require("dotenv").config();
+require("dotenv").config();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 //const mnemonic = process.env.ETH_MNEMONIC;
@@ -28,7 +28,6 @@ const pk_rinkeby = process.env.RINKEBY_ETH_PK
 const pk_mainnet = process.env.ETH_PK
 const matic_pk = process.env.MATIC_PK
 const mumbai_pk = process.env.MUMBAI_MATIC_PK
-  "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish"
 
 // ganache-cli -m "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish" -l 10000000 --allowUnlimitedContractSize
 
@@ -121,7 +120,7 @@ module.exports = {
       gas: 8000000,
       gasPrice: 80000000000,
       confirmations: 2,   
-      timeoutBlocks: 200,  
+      timeoutBlocks: 700,  
       skipDryRun: true 
     },
 
@@ -134,7 +133,7 @@ module.exports = {
         ),
       network_id: 1,
       gas: 10000000,
-      gasPrice: 85000000000,
+      gasPrice: 95000000000,
     },
 //https://rpc-mumbai.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6
 //https://rpc-mumbai.matic.today

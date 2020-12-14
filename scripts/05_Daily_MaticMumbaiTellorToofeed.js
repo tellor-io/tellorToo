@@ -13,27 +13,29 @@ const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
 
-const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+//const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
 const mumbai_pk = process.env.MUMBAI_MATIC_PK
 
-var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+//var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+var web3 = new Web3(new HDWalletProvider(mumbai_pk, `https://rpc-mumbai.matic.today`));
 
-
-var centralizedOracleAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
+var tellorTooAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
-
+//const URL1 = `https://www.etherchain.org/api/gasPriceOracle`;
+//const URL2 = 'https://gasstation-mainnet.matic.network'
 //Function to get gas price
 async function fetchGasPrice() {
   const URL = `https://www.etherchain.org/api/gasPriceOracle`;
+  //const URL = 'https://gasstation-mainnet.matic.network';
   try {
     const fetchResult = fetch(URL);
     const response = await fetchResult;
     const jsonData = await response.json();
     const gasPriceNow = await jsonData.standard*1;
     const gasPriceNow2 = await (gasPriceNow + 1)*1000000000;
-    console.log(jsonData);
+    //console.log(jsonData);
     //console.log("gasPriceNow", gasPriceNow);
     //console.log("gasPriceNow2", gasPriceNow2);
     return(gasPriceNow2);
@@ -81,6 +83,7 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no gas price fetched");
+        process.exit(1)
     }
 
     var k = dataAPIs.length;
@@ -105,7 +108,7 @@ module.exports =async function(callback) {
         timestamp = (Date.now())/1000 | 0
         console.log(timestamp)
         //send update to centralized oracle
-        co = await TellorToo.at(centralizedOracleAddress)
+        co = await TellorToo.at(tellorTooAddress)
         await co.submitData(req, timestamp, apiPrice)
         rdat = await co.retrieveData(req, timestamp);
         console.log(rdat*1)
@@ -133,6 +136,7 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no price fetched");
+        process.exit(1)
     }
     }
 

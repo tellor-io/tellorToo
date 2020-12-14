@@ -15,6 +15,7 @@ var HDWalletProvider = require("@truffle/hdwallet-provider");
 
 const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
 const mumbai_pk = process.env.MUMBAI_MATIC_PK
+const mumbai_pub = process.env.MUMBAI_MATIC_PUB
 
 var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
 
@@ -40,8 +41,8 @@ module.exports =async function(callback) {
          '0x8bC54c696d9F912037689CE04109B007a9b15aD8',
          '0x84005BA16a117Ac1B94da7a7FdaF6882f82EA3F5']
 
-    owner = '0xFAE65F91c2FbD2cecB35351b77B5d28c13F8AEF3'
-    oracle = '0xFAE65F91c2FbD2cecB35351b77B5d28c13F8AEF3'
+    owner = mumbai_pub
+    oracle = mumbai_pub
 
     receiverStorage = await ReceiverStorage.new()
     console.log("receiverStorage: ", receiverStorage.address)
@@ -61,5 +62,5 @@ module.exports =async function(callback) {
     //usingTellor = await UsingTellor.new(centralizedOracle.address)
     //console.log("usingTellor: ", usingTellor.address)
 
-
+    process.exit()
 }

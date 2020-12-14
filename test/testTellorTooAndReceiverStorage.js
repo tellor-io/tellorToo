@@ -22,7 +22,7 @@ const helpers = require("./helpers/test_helpers");
     receiverStorage = await ReceiverStorage.new()
   	sender = await TellorSender.new(mockTellor.address, mockSender.address, receiverStorage.address) 
     tellorToo = await TellorToo.new(receiverStorage.address, accounts[0], accounts[0],web3.utils.toWei("10"))
-    usingTellor = await UsingTellor.new(tellorToo.address)
+    //usingTellor = await UsingTellor.new(tellorToo.address)
   });
 
   it("Add new dataset to tellorToo and submit data ", async function() {
@@ -75,7 +75,11 @@ const helpers = require("./helpers/test_helpers");
    });
 
   it(" Test challengeData and isUnderChallenge and settle challenge", async function() {
-  	let _now  =  await mockTellor.getTime()
+    //let _now  =  (Date.now() - (Date.now() % 84000))/1000;
+    let _now  = ( (Date.now() /1000)| 0 );
+    // console.log("now js", _now)
+    // let _now1  =  await mockTellor.getTime()
+    // console.log("now solidity", _now1*1)
     await tellorToo.newDataset( 1,3600) 
     await tellorToo.submitData(1, _now, 1000)
     let val =await tellorToo.retrieveData(1, _now)
@@ -101,7 +105,8 @@ const helpers = require("./helpers/test_helpers");
    });
 
   it("test three data points", async function() {
-    let _now  =  await mockTellor.getTime()
+    let _now  =  (Date.now() - (Date.now() % 84000))/1000;
+    //let _now  =  await mockTellor.getTime()
     await tellorToo.newDataset( 1,  3600) 
     await tellorToo.newDataset( 2,  60) 
     await tellorToo.newDataset( 3,  360) 
@@ -115,7 +120,11 @@ const helpers = require("./helpers/test_helpers");
    });
 
   it("test challenge then resumption of optimistic oracle and assert throw of locked period", async function() {
-    let _now  =  await mockTellor.getTime()
+    
+    let _now  = ( (Date.now() /1000)| 0 ) + 3600 ;
+    //console.log("now", _now)
+    //let _now1  =  await mockTellor.getTime()
+    //console.log("solidity now", _now1*1)
     await tellorToo.newDataset( 1,  3600) 
     await tellorToo.submitData(1, _now, 1000)
     let val =await tellorToo.retrieveData(1, _now)
@@ -148,7 +157,10 @@ const helpers = require("./helpers/test_helpers");
     let dispute
     let _now
     for(var i=1;i<5;i++){
-      _now  =  await mockTellor.getTime()
+      let _now  = ( (Date.now() /1000)| 0 ) + (3600*(1+i));
+      //let _nowSolidity  =  await mockTellor.getTime()
+      //console.log("_nowSolidity", _nowSolidity*1)
+
       await tellorToo.newDataset( 1,  3600) 
       await tellorToo.submitData(1, _now, 1000*i)
       val =await tellorToo.retrieveData(1, _now)
@@ -172,7 +184,8 @@ const helpers = require("./helpers/test_helpers");
     }
    });
    // it("test central oracle usingTellor functions", async function() {
-   //    let _now  =  await mockTellor.getTime()
+   //    //let _now  =  await mockTellor.getTime()
+   //    let _now  =  (Date.now() - (Date.now() % 84000))/1000;
    //    await tellorToo.newDataset( 1,  3600) 
    //    await tellorToo.submitData(1, _now, 1000)
    //    let val = await usingTellor.retrieveData(1,_now);
@@ -202,7 +215,8 @@ const helpers = require("./helpers/test_helpers");
    //    let logdata
    //    let dispute
    //    let _now
-   //    _now  =  await mockTellor.getTime()
+   //    //_now  =  await mockTellor.getTime()
+   //    _now  =  (Date.now() - (Date.now() % 84000))/1000;
    //    await tellorToo.newDataset( 1,  3600) 
    //    await tellorToo.submitData(1, _now, 1000*i)
    //    val = await tellorToo.retrieveData(1, _now)

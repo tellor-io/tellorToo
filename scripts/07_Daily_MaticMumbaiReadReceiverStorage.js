@@ -81,6 +81,7 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no gas price fetched");
+        process.exit(1)
     }
 
     var k = dataAPIs.length;
@@ -131,6 +132,7 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no price fetched");
+        process.exit(1)
     }
     }
 

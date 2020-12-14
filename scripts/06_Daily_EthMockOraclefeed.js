@@ -21,10 +21,10 @@ const pk_test = process.env.RINKEBY_ETH_PK
 
 var web3 = new Web3(new HDWalletProvider(pk_test, "https://goerli.infura.io/v3/" + accessToken));
 
-
+//update sender address
 var tellorSenderAddress = '0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921'
 //tellorPlayground = 0x20374E579832859f180536A69093A126Db1c8aE9
-var mockTellorAddress = '0x6DAdBde8Ad5F06334A7871e4da02698430c754FF'
+var mockTellorAddress = '0x20374E579832859f180536A69093A126Db1c8aE9'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
@@ -86,6 +86,7 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no gas price fetched");
+        process.exit(1)
     }
 
     var k = dataAPIs.length;
@@ -146,6 +147,7 @@ module.exports =async function(callback) {
       } catch(error){
         console.error(error);
         console.log("no price fetched");
+        process.exit(1)
       }
     }
 
