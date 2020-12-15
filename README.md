@@ -54,7 +54,7 @@ contract YourContract is TellorToo {
 
 ## Addresses
 
-Mainnet:
+Mainnets:
 * Matic TellorToo :  [0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D](
 https://explorer-mumbai.maticvigil.com/address/0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D/contracts)
 
@@ -62,10 +62,10 @@ https://explorer-mumbai.maticvigil.com/address/0xBf8a66DeC65A004B6D89950079B6601
 https://goerli.etherscan.io/address/0x050514e7d074f670758114aacce776943a95e105#code)
 
 Testnets:
-* Mumbai TellorToo :  [0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D](
+* Mumbai (Matic's testnet) TellorToo :  [0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D](
 https://explorer-mumbai.maticvigil.com/address/0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D/contracts)
 
-* Goerli TellorSender:  [0x050514e7d074F670758114AaCcE776943A95E105](
+* Goerli (Ethereum's testnet)TellorSender:  [0x050514e7d074F670758114AaCcE776943A95E105](
 https://goerli.etherscan.io/address/0x050514e7d074f670758114aacce776943a95e105#code)
 
 
