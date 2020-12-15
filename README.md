@@ -5,14 +5,13 @@ TellorToo, allows users to access numerical data with the option to challenge th
 ## Getting data
 Get data on your smart contract by reading from TellorToo by calling the function a single function:
 
-1. getCurrentValue.
+* getCurrentValue
 
 ```Solidity
 getCurrentValue(uint256 _requestId)
 ```
 
 Here is the list with the definitions of each requestId:
- 
 [https://docs.tellor.io/dev-documentation/reference-page/data-request-ids-1](https://docs.tellor.io/dev-documentation/reference-page/data-request-ids-1)
 
 
@@ -21,9 +20,8 @@ If the data needed is not available, please submit a Tellor Improvement Plan[(TI
 
 ### Code example
 
-* Allow your contract to read from TellorToo
+Allow your contract to read from TellorToo
 
-TellorToo allows for faster data feeds. However, Tellor's data from Ethereum will supersede the oracle's value if the user challenges the validity of the value provided. 
 
 ```solidity
 import "./TellorToo.sol";
@@ -73,8 +71,6 @@ https://goerli.etherscan.io/address/0x050514e7d074f670758114aacce776943a95e105#c
 
 ### Challenge Data
 
-* Challenge invalid data 
-
 Challenge invalid data and automatically fall back to Tellor's Ethereum's data. A fee to intiate a challenge is charged to incentivize pushing Ethereum's data and to disincentivize spaming the network with irrelevant challenges. The challenge fee is paid out to the party that runs the Sender.retrieveDataAndSend or Sender.getCurrentValueAndSend functions on Ethereum's mainnet to send over data to settle the challenge on the side chain. 
 
 ```solidity
@@ -82,8 +78,6 @@ function challengeData(uint256 _requestId, uint256 _timestamp)
 ```
 
 ### Settle challenge
-
-* Settle the challenge on the side chain
 
 Once a challenge is initiated, there is a 1 hour wait time before it can be settled to Tellor's mainnet. The wait time allows for data to be requested on Tellor mainnet, in the event that it has not been mined in the allowed timeframe(data can be too old). To allow enough time for disputes on mainnet data, once the data is available on mainnet there is also a 1 hour wait time before the challenge can be settled.
 
