@@ -1,35 +1,41 @@
-
 /**************************Matic Auto data feed********************************************/
 
 //                Centralized oracle price feed                                   //
 
 /******************************************************************************************/
-const MockTellor = artifacts.require('./MockTellor')
-const Sender = artifacts.require('./Sender')
+//truffle exec scripts/06_MaticMumbaiCentralizedOraclefeed.js --network mumbai
+require("dotenv").config();
+
+const TellorToo = artifacts.require('./TellorToo')
 
 var fs = require('fs');
 const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
-var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
 
-var senderAddress = '0x09c5c2673D74aAf34005da85Ee50cE5Ff6406921'
-var mockTellorAddress = '0x6DAdBde8Ad5F06334A7871e4da02698430c754FF'
+//const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
+
+//var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+var web3 = new Web3(new HDWalletProvider(mumbai_pk, `https://rpc-mumbai.matic.today`));
+
+var tellorTooAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
-
+//const URL1 = `https://www.etherchain.org/api/gasPriceOracle`;
+//const URL2 = 'https://gasstation-mainnet.matic.network'
 //Function to get gas price
 async function fetchGasPrice() {
   const URL = `https://www.etherchain.org/api/gasPriceOracle`;
+  //const URL = 'https://gasstation-mainnet.matic.network';
   try {
     const fetchResult = fetch(URL);
     const response = await fetchResult;
     const jsonData = await response.json();
     const gasPriceNow = await jsonData.standard*1;
     const gasPriceNow2 = await (gasPriceNow + 1)*1000000000;
-    console.log(jsonData);
+    //console.log(jsonData);
     //console.log("gasPriceNow", gasPriceNow);
     //console.log("gasPriceNow2", gasPriceNow2);
     return(gasPriceNow2);
@@ -77,22 +83,21 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no gas price fetched");
+        process.exit(1)
     }
 
     var k = dataAPIs.length;
-    for (i=1; i<k; i++){
-      try{
+    for (i=0; i<k; i++){
+    try{
         let dat
         let point
         let cur
         let req
         let apiPrice
-        let mo
+        let co
         let timestamp
         let rdat
         let rdat1
-        let send
-        let res
 
         dat = dataAPIs[i]
         point = pointers[i]
@@ -100,22 +105,18 @@ module.exports =async function(callback) {
         req = requestIds[i]
         apiPrice = await fetchPrice(dat, point, cur)
         console.log("apiPrice", apiPrice)
-
+        timestamp = (Date.now())/1000 | 0
+        console.log(timestamp)
         //send update to centralized oracle
-        mo = await MockTellor.at(mockTellorAddress)
-        await mo.submitValue(req, apiPrice)
-        value = await mo.getCurrentValue(req)
-        console.log(value*1)
-        value1 = value*1
-
-        send = await Sender.at(senderAddress)
-        await send.getCurrentValueAndSend(req);
-        console.log("value sent")
-
-        if (apiPrice == value1) {
+        co = await TellorToo.at(tellorTooAddress)
+        await co.submitData(req, timestamp, apiPrice)
+        rdat = await co.retrieveData(req, timestamp);
+        console.log(rdat*1)
+        rdat1 = rdat*1
+        if (apiPrice == rdat1) {
             console.log("Data is on chain, save a copy")
-            //save entry on txt file/json
-            let saving  = "requestId" + i;
+        //save entry on txt file/json
+        let saving  = "requestId" + i;
             saving = {Id: i,
                     time: timestamp,
                     value: apiPrice,
@@ -124,17 +125,19 @@ module.exports =async function(callback) {
                 }
             let jsonName = JSON.stringify(saving);
             console.log("InitialReqID info", jsonName);
-            let filename = "./savedData/EthGoerlireqID" + i + ".json";
+            let filename = "./savedData/MaticMumbaireqID" + i + ".json";
             fs.writeFile(filename, jsonName, function(err) {
                 if (err) {
                     console.log(err);
                 }
             });
         }
-      } catch(error){
+
+    } catch(error){
         console.error(error);
         console.log("no price fetched");
-      }
+        process.exit(1)
+    }
     }
 
     process.exit()

@@ -18,13 +18,16 @@
  *
  */
 
- require("dotenv").config();
+require("dotenv").config();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 //const mnemonic = process.env.ETH_MNEMONIC;
-const accessToken = process.env.WEB3_INFURA_PROJECT_ID;
-const mnemonic =
-  "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish";
+const accessToken = process.env.WEB3_INFURA_PROJECT_ID
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const pk_rinkeby = process.env.RINKEBY_ETH_PK
+const pk_mainnet = process.env.ETH_PK
+const matic_pk = process.env.MATIC_PK
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
 
 // ganache-cli -m "brenda tim nick jg krasi mike ryan charlie delta ocean produce wish" -l 10000000 --allowUnlimitedContractSize
 
@@ -88,7 +91,7 @@ module.exports = {
     ropsten: {
       provider: () =>
         new HDWalletProvider(
-          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+          pk_rinkeby,
           `https://ropsten.infura.io/v3/${accessToken}`
         ),
       network_id: 3,
@@ -99,7 +102,7 @@ module.exports = {
     rinkeby: {
       provider: () =>
         new HDWalletProvider(
-          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+          pk_rinkeby,
           `https://rinkeby.infura.io/v3/${accessToken}`
         ),
       network_id: 4,
@@ -110,14 +113,14 @@ module.exports = {
     goerli: {
       provider: () =>
         new HDWalletProvider(
-          "12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef",
+          pk_rinkeby,
           `https://goerli.infura.io/v3/${accessToken}`
         ),
       network_id: 5,
       gas: 8000000,
       gasPrice: 80000000000,
       confirmations: 2,   
-      timeoutBlocks: 200,  
+      timeoutBlocks: 700,  
       skipDryRun: true 
     },
 
@@ -125,20 +128,35 @@ module.exports = {
     mainnet: {
       provider: () =>
         new HDWalletProvider(
-          "",
+          pk_mainnet,
           `https://mainnet.infura.io/v3/${accessToken}`
         ),
       network_id: 1,
       gas: 10000000,
-      gasPrice: 85000000000,
+      gasPrice: 95000000000,
     },
 //https://rpc-mumbai.maticvigil.com/v1/a5e55a186479f268d9f0ce74541191c3082877b6
 //https://rpc-mumbai.matic.today
     mumbai: {
-    provider: () => new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`),
+    provider: () => new HDWalletProvider(
+      mumbai_pk,
+       `https://rpc-mumbai.maticvigil.com/v1/${matic_accessToken}`),
       network_id: "80001",       
       gas: 8000000,    
       gasPrice: 3000000000,
+      confirmations: 2,   
+      timeoutBlocks: 200,  
+      skipDryRun: true     
+    },  
+  
+
+    matic: {
+    provider: () => new HDWalletProvider(
+      matic_pk, 
+      `https://rpc-mainnet.maticvigil.com/v1/${matic_accessToken}`),
+      network_id: "137",       
+      gas: 4000000,    
+      gasPrice: 5000000000,
       confirmations: 2,   
       timeoutBlocks: 200,  
       skipDryRun: true     
@@ -165,7 +183,7 @@ module.exports = {
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: true,
-          runs: 200
+          runs: 5000000
         },
       //  evmVersion: "byzantium"
       // }

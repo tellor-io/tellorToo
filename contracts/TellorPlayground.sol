@@ -1,9 +1,10 @@
 pragma solidity 0.5.16;
 
+//import "usingtellor/contracts/TellorPlayground.sol";
 import "./libraries/SafeMath.sol";
 
 
-contract MockTellor {
+contract TellorPlayground {
 
     using SafeMath for uint256;
     event Transfer(address indexed _from, address indexed _to, uint256 _value);//ERC20 Transfer Event
@@ -21,6 +22,7 @@ contract MockTellor {
             totalSupply = totalSupply.add(_intialAmounts[i]);
         }
     }
+
 
     function mint(address _holder, uint256 _value) public {
         balances[_holder] = balances[_holder].add(_value);
@@ -67,7 +69,7 @@ contract MockTellor {
         return timestamps[_requestId][index];
     }
 
-    function getTime() public view returns(uint256){
-        return now;
-    }
+    // function getTime() public view returns(uint256){
+    //     return now;
+    // }
 }

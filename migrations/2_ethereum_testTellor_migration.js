@@ -5,7 +5,7 @@
 /*****************************************************************************************/
 
 
-const MockTellor = artifacts.require('MockTellor.sol');
+const MockTellor = artifacts.require('TellorPlayground.sol');
 
 
 /**

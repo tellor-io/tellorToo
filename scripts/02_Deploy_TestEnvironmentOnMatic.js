@@ -4,19 +4,20 @@
 
 /******************************************************************************************/
 
-const MockTellor = artifacts.require('./MockTellor')
+const TellorPlayground = artifacts.require('./TellorPlayground')
 const UsingTellor = artifacts.require('./UsingTellor')
-const MockSender = artifacts.require("./MockSender")
-const Sender = artifacts.require('./Sender')
+const TellorSender = artifacts.require('./TellorSender')
 const ReceiverStorage = artifacts.require('./ReceiverStorage')
-const CentralizedOracle = artifacts.require('./CentralizedOracle')
-
-
+const TellorToo = artifacts.require('./TellorToo')
 
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
 
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
+const mumbai_pub = process.env.MUMBAI_MATIC_PUB
+
+var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
 
 // function sleep_s(secs) {
 //   secs = (+new Date) + secs * 1000;
@@ -26,9 +27,8 @@ var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2
 module.exports =async function(callback) {
 
   let mockTellor
-  //let mockSender
   let usingTellor
-  let sender
+  let tellorSender
   let receiverStorage
   let centralizedOracle
   let accts
@@ -41,26 +41,26 @@ module.exports =async function(callback) {
          '0x8bC54c696d9F912037689CE04109B007a9b15aD8',
          '0x84005BA16a117Ac1B94da7a7FdaF6882f82EA3F5']
 
-    owner = '0xFAE65F91c2FbD2cecB35351b77B5d28c13F8AEF3'
-    oracle = '0xFAE65F91c2FbD2cecB35351b77B5d28c13F8AEF3'
+    owner = mumbai_pub
+    oracle = mumbai_pub
 
     receiverStorage = await ReceiverStorage.new()
     console.log("receiverStorage: ", receiverStorage.address)
 
-    mockTellor= await MockTellor.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
+    mockTellor= await TellorPlayground.new(accts, [web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000"),web3.utils.toWei("5000")])
     console.log("mockTellor: ", mockTellor.address)
 
     mockSender = await MockSender.new();
     console.log("mockSender: ", mockSender.address)
   	
-    sender = await Sender.new(mockTellor.address, mockSender.address, receiverStorage.address) 
-    console.log("sender: ", sender.address)
+    tellorSender = await TellorSender.new(mockTellor.address, mockSender.address, receiverStorage.address) 
+    console.log("tellorsender: ", tellorSender.address)
 
-    centralizedOracle = await CentralizedOracle.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
-    console.log("centralizedOracle: ", centralizedOracle.address)
+    tellorToo = await TellorToo.new(receiverStorage.address, owner, oracle,web3.utils.toWei("10"))
+    console.log("centralizedOracle: ", TellorToo.address)
 
-    usingTellor = await UsingTellor.new(centralizedOracle.address)
-    console.log("usingTellor: ", usingTellor.address)
+    //usingTellor = await UsingTellor.new(centralizedOracle.address)
+    //console.log("usingTellor: ", usingTellor.address)
 
-
+    process.exit()
 }

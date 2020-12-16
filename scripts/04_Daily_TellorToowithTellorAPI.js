@@ -1,18 +1,25 @@
 /**************************Matic Auto data feed********************************************/
 
-//                Centralized oracle price feed                                   //
+//                TellorToo oracle price feed                                   //
 
 /******************************************************************************************/
-const CentralizedOracle = artifacts.require('./CentralizedOracle')
+//truffle exec scripts/06_MaticMumbaiCentralizedOraclefeed.js --network mumbai
+require("dotenv").config();
+
+const TellorToo = artifacts.require('./TellorToo')
 
 var fs = require('fs');
 const fetch = require('node-fetch-polyfill');
 const Web3 = require('web3')
 var HDWalletProvider = require("@truffle/hdwallet-provider");
-var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", `https://rpc-mumbai.matic.today`));
-//var web3 = new Web3(new HDWalletProvider("12ae9e5a8755e9e1c06339e0de36ab4c913ec2b30838d2826c81a5f5b848adef", "https://goerli.infura.io/v3/7f11ed6df93946658bf4c817620fbced"));
 
-var centralizedOracleAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
+const matic_accessToken = process.env.MATIC_ACCESS_TOKEN
+const mumbai_pk = process.env.MUMBAI_MATIC_PK
+
+var web3 = new Web3(new HDWalletProvider(mumbai_pk, "https://rpc-mumbai.maticvigil.com/v1/" + matic_accessToken));
+
+
+var tellorTooAddress = '0xbac0B75F2F5f34bbFC89F3A820cFDf7bEB677F7a'
 var _UTCtime  = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 console.log("_UTCtime: ", _UTCtime)
 
@@ -74,10 +81,11 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no gas price fetched");
+        process.exit(1)
     }
 
     var k = dataAPIs.length;
-    for (i=1; i<k; i++){
+    for (i=0; i<k; i++){
     try{
         let dat
         let point
@@ -98,7 +106,7 @@ module.exports =async function(callback) {
         timestamp = (Date.now())/1000 | 0
         console.log(timestamp)
         //send update to centralized oracle
-        co = await CentralizedOracle.at(centralizedOracleAddress)
+        co = await TellorToo.at(tellorTooAddress)
         await co.submitData(req, timestamp, apiPrice)
         rdat = await co.retrieveData(req, timestamp);
         console.log(rdat*1)
@@ -126,6 +134,7 @@ module.exports =async function(callback) {
     } catch(error){
         console.error(error);
         console.log("no price fetched");
+        process.exit(1)
     }
     }
 

@@ -1,9 +1,7 @@
 // File: contracts\ReceiverStorage.sol
 
-// ReceiverStorage.sol
-
 pragma solidity 0.5.16;
-
+// ReceiverStorage.sol
 
 /**
 @title ReceiverStorage
@@ -20,7 +18,7 @@ contract ReceiverStorage {
 
   /**
   @dev This function allows Matic validators to provide Tellor's data. 
-  @param stateId is used by Matic validators to uniquely identify the state when the byte data was provided ???
+  @param stateId is used by Matic validators to uniquely identify the state when the byte data was provided
   @param data is the byte data with the specified output from an event on Ethereum
   */
   function onStateReceive(uint256 stateId, bytes calldata data) external {
