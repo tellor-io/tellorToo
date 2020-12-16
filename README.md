@@ -55,11 +55,11 @@ contract YourContract is TellorToo {
 ## Addresses
 
 Mainnets:
-* Matic TellorToo :  [0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D](
-https://explorer-mumbai.maticvigil.com/address/0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D/contracts)
+* Matic TellorToo :  [0x77352E8f026cb5D880AcFe06F9Acc215E0711F85](
+https://explorer-mainnet.maticvigil.com/address/0x77352E8f026cb5D880AcFe06F9Acc215E0711F85/contracts)
 
-* Ethereum TellorSender:  [0x050514e7d074F670758114AaCcE776943A95E105](
-https://goerli.etherscan.io/address/0x050514e7d074f670758114aacce776943a95e105#code)
+* Ethereum TellorSender:  [0xb9516057dc40c92f91b6ebb2e3d04288cd0446f1](
+https://etherscan.io/address/0xb9516057dc40c92f91b6ebb2e3d04288cd0446f1#code)
 
 Testnets:
 * Mumbai (Matic's testnet) TellorToo :  [0xBf8a66DeC65A004B6D89950079B66013A4ac9f0D](
